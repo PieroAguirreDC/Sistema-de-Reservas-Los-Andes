@@ -28,9 +28,9 @@ locals {
   # Públicas    : 10.0.0.0/24  | 10.0.1.0/24
   # App privada : 10.0.10.0/24 | 10.0.11.0/24
   # DB privada  : 10.0.20.0/24 | 10.0.21.0/24
-  public_cidrs  = [cidrsubnet(var.vpc_cidr, 8, 0),  cidrsubnet(var.vpc_cidr, 8, 1)]
-  app_cidrs     = [cidrsubnet(var.vpc_cidr, 8, 10), cidrsubnet(var.vpc_cidr, 8, 11)]
-  db_cidrs      = [cidrsubnet(var.vpc_cidr, 8, 20), cidrsubnet(var.vpc_cidr, 8, 21)]
+  public_cidrs = [cidrsubnet(var.vpc_cidr, 8, 0), cidrsubnet(var.vpc_cidr, 8, 1)]
+  app_cidrs    = [cidrsubnet(var.vpc_cidr, 8, 10), cidrsubnet(var.vpc_cidr, 8, 11)]
+  db_cidrs     = [cidrsubnet(var.vpc_cidr, 8, 20), cidrsubnet(var.vpc_cidr, 8, 21)]
 
   base_tags = merge({
     Project     = var.project_name
@@ -46,8 +46,8 @@ data "aws_availability_zones" "available" {
 
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
-  enable_dns_hostnames = true  # Requerido por VPC Endpoints de tipo Interface
-  enable_dns_support   = true  # Requerido por VPC Endpoints de tipo Interface
+  enable_dns_hostnames = true # Requerido por VPC Endpoints de tipo Interface
+  enable_dns_support   = true # Requerido por VPC Endpoints de tipo Interface
 
   tags = {
     Name = "${local.name_prefix}-vpc"
@@ -180,7 +180,7 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.main.id
   service_name      = "com.amazonaws.${var.aws_region}.s3"
   vpc_endpoint_type = "Gateway"
-  route_table_ids = [aws_route_table.private_app.id]
+  route_table_ids   = [aws_route_table.private_app.id]
 
   tags = {
     Name = "${local.name_prefix}-endpoint-s3"
