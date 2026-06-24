@@ -1,0 +1,10 @@
+project_name          = "reservas"
+environment           = "dev"
+aws_region            = "us-east-1"
+vpc_id                = "vpc-00000000000000000"
+private_db_subnet_ids = ["subnet-00000000000000001", "subnet-00000000000000002"]
+availability_zones    = ["us-east-1a", "us-east-1b"]
+kms_key_arn           = "arn:aws:kms:us-east-1:123456789012:key/00000000-0000-0000-0000-000000000000"
+sg_rds_id             = "sg-00000000000000000"
+secret_rds_arn        = "arn:aws:secretsmanager:us-east-1:123456789012:secret:reservas-dev/rds/credentials-xxxxxx"
+db_master_password = "MiPasswordDePrueba123!"
