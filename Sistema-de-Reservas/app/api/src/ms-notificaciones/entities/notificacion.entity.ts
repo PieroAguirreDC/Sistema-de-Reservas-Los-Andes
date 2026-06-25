@@ -3,17 +3,17 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 @Entity('notificaciones')
 export class Notificacion {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string = '';
 
   @Column()
-  usuario_id: string;
+  usuario_id: string = '';
 
   @Column()
-  mensaje: string;
+  mensaje: string = '';
 
   @Column({ default: false })
-  leida: boolean;
+  leida: boolean = false;
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at: Date = new Date();
 }

@@ -1,13 +1,18 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller, Get, Post, Put, Delete,
+  Param, Body, Query,
+} from '@nestjs/common';
 import { ReservasService } from './reservas.service';
+import { CreateReservaDto } from './dto/create-reserva.dto';
+import { Reserva } from './entities/reserva.entity';
 
 @Controller('reservas')
 export class ReservasController {
   constructor(private readonly reservasService: ReservasService) {}
 
   @Get()
-  findAll() {
-    return this.reservasService.findAll();
+  findAll(@Query('usuario_id') usuario_id?: string) {
+    return this.reservasService.findAll(usuario_id);
   }
 
   @Get(':id')
@@ -16,12 +21,12 @@ export class ReservasController {
   }
 
   @Post()
-  create(@Body() body: object) {
-    return this.reservasService.create(body);
+  create(@Body() dto: CreateReservaDto) {
+    return this.reservasService.create(dto);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: object) {
+  update(@Param('id') id: string, @Body() body: Partial<Reserva>) {
     return this.reservasService.update(id, body);
   }
 
