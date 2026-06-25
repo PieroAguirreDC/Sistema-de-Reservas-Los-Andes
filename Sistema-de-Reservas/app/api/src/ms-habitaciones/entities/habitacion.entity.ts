@@ -3,20 +3,20 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 @Entity('habitaciones')
 export class Habitacion {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string;
 
   @Column()
-  numero!: string;
+  numero: string;
 
   @Column()
-  tipo!: string;
+  tipo: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  precio_por_noche!: number;
+  precio_por_noche: number;
 
   @Column({ default: true })
-  disponible!: boolean;
+  disponible: boolean;
 
   @Column({ nullable: true })
-  descripcion!: string;
+  descripcion: string;
 }
