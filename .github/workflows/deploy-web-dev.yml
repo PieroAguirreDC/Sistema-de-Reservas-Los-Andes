@@ -1,0 +1,110 @@
+name: Deploy Web dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "Sistema-de-Reservas/app/web/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY_WEB }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE_WEB }}
+  TASK_FAMILY: ${{ vars.TASK_FAMILY_WEB }}
+
+jobs:
+
+  deploy:
+    name: Analizar & Desplegar Web
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: configurar node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: Sistema-de-Reservas/app/web/package-lock.json
+
+      - name: instalar dependencias del frontend
+        working-directory: Sistema-de-Reservas/app/web
+        run: npm ci
+
+      - name: verificar tipado de typescript
+        working-directory: Sistema-de-Reservas/app/web
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      - name: autenticacion oidc con aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: login en aws ecr
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: verificar o crear repositorio ecr
+        run: |
+          aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} \
+            --region ${{ env.AWS_REGION }} 2>/dev/null || \
+          aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY }} \
+            --region ${{ env.AWS_REGION }} \
+            --image-scanning-configuration scanOnPush=true \
+            --encryption-configuration encryptionType=AES256
+
+      - name: construir, etiquetar y pushear imagen del frontend a ecr
+        id: build-imagen
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            --build-arg NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }} \
+            -f Sistema-de-Reservas/app/web/Dockerfile \
+            Sistema-de-Reservas/app/web/
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: descargar la definicion de tarea actual desde ecs
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.TASK_FAMILY }} \
+            --query taskDefinition > task-definition.json
+
+      - name: inyectar la nueva imagen y variables de entorno en la definicion
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: web
+          image: ${{ steps.build-imagen.outputs.image }}
+          environment-variables: |
+            NODE_ENV=production
+            PORT=3000
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+
+      - name: desplegar nueva version del frontend en aws ecs
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          wait-for-service-stability: true
