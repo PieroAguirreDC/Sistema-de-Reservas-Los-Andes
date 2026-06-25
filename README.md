@@ -194,8 +194,21 @@ npm install @nestjs/config
 # Compilar
 npm run build
 
-# Correr en desarrollo
+# Correr en desarrollo en local
 npm run start:dev
+```
+
+### NestJS — API - Ejecución en otro entorno local
+
+```bash
+# Instalar NestJS CLI
+npm install -g @nestjs/cli
+
+# Compilar
+npm run build
+
+# Levantar la imagen de la API con la BD
+docker compose up --build
 ```
 
 ### Next.js — Frontend

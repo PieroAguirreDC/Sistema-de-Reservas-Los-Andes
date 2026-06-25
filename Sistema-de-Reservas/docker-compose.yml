@@ -34,5 +34,20 @@ services:
     depends_on:
       - postgres
 
+  web:
+      build:
+        context: ./app/web
+        dockerfile: Dockerfile.dev
+      container_name: reservas-web
+      environment:
+        NEXT_PUBLIC_API_URL: http://localhost:3000
+      ports:
+        - "3001:3000"
+      volumes:
+        - ./app/web:/app
+        - /app/node_modules
+        - /app/.next
+      depends_on:
+        - api
 volumes:
   postgres_data:

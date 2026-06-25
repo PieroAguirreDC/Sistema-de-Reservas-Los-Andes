@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReservasModule } from './ms-reservas/reservas.module';
 import { HabitacionesModule } from './ms-habitaciones/habitaciones.module';
 import { UsuariosModule } from './ms-usuarios/usuarios.module';
@@ -9,7 +10,16 @@ import { NotificacionesModule } from './ms-notificaciones/notificaciones.module'
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    // TypeOrmModule.forRootAsync({ ... }) <- comentado hasta tener DB
+    TypeOrmModule.forRoot({
+    type: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    database: process.env.DB_NAME || 'reservas_db',
+    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    synchronize: process.env.NODE_ENV !== 'production', // ← este es el único cambio
+  }),
     ReservasModule,
     HabitacionesModule,
     UsuariosModule,
