@@ -1,0 +1,217 @@
+name: Terraform IaC dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "Sistema-de-Reservas/iac/**"
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - "Sistema-de-Reservas/iac/**"
+  workflow_dispatch:
+    inputs:
+      accion:
+        description: "Acción a ejecutar (plan | apply | destroy)"
+        required: true
+        default: "plan"
+        type: choice
+        options: [plan, apply, destroy]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  AWS_REGION: us-east-1
+  TF_VERSION: "1.8.5"
+  WORKING_DIR: Sistema-de-Reservas/iac
+
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+  TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+  TF_LOCK_TABLE: ${{ vars.TF_LOCK_TABLE }}
+
+jobs:
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 1 — Lint, formato y análisis estático de seguridad (Checkov)
+  # ─────────────────────────────────────────────────────────────────────────
+  validar:
+    name: Validar & Escanear
+    runs-on: ubuntu-latest
+    environment: dev
+
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+
+    steps:
+      - name: checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: configurar terraform ${{ env.TF_VERSION }}
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: verificar formato de terraform
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: inicializar terraform sin backend (solo validación)
+        run: |
+          terraform init -backend=false \
+            -var="db_master_password=placeholder_validacion" \
+            -var="redis_auth_token=placeholder_validacion_16c"
+
+      - name: validar configuración de terraform
+        run: terraform validate
+
+      - name: escaneo de seguridad con checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: ${{ env.WORKING_DIR }}
+          framework: terraform
+          output_format: github_failed_only
+          soft_fail: false
+          # Falsos positivos aceptados y documentados:
+          # CKV_AWS_130 → subredes públicas para ALB (intencional)
+          # CKV2_AWS_35 → sin NAT Gateway (se usa VPC Endpoints)
+          # CKV_AWS_260 → puerto 80 en ALB para redirect a HTTPS
+          # CKV_AWS_25/277/24 → checks de puertos en SG de ALB (diseño correcto)
+          skip_check: >-
+            CKV_AWS_130,
+            CKV2_AWS_35,
+            CKV_AWS_260,
+            CKV_AWS_25,
+            CKV_AWS_277,
+            CKV_AWS_24
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 2 — Terraform Plan (necesita credenciales AWS)
+  # ─────────────────────────────────────────────────────────────────────────
+  plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: validar
+    environment: dev
+
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+
+    steps:
+      - name: checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: autenticacion oidc con aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: terraform-plan-${{ github.run_id }}
+
+      - name: configurar terraform ${{ env.TF_VERSION }}
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: inicializar terraform con backend remoto
+        run: terraform init
+
+      - name: ejecutar terraform plan
+        id: plan
+        run: |
+          terraform plan \
+            -var-file="terraform.tfvars" \
+            -out=tfplan \
+            -input=false \
+            -no-color 2>&1 | tee plan_output.txt
+        env:
+          TF_VAR_db_master_password: ${{ secrets.DB_MASTER_PASSWORD }}
+          TF_VAR_redis_auth_token: ${{ secrets.REDIS_AUTH_TOKEN }}
+
+      - name: publicar plan en el pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const planPath = '${{ env.WORKING_DIR }}/plan_output.txt';
+            const output = fs.readFileSync(planPath, 'utf8');
+            const truncated = output.length > 60000
+              ? output.substring(0, 60000) + '\n...[plan truncado, ver logs completos]'
+              : output;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📋 Terraform Plan — \`${context.ref}\`\n\`\`\`hcl\n${truncated}\n\`\`\``
+            });
+
+      - name: subir plan como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ github.run_id }}
+          path: ${{ env.WORKING_DIR }}/tfplan
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 3 — Terraform Apply (solo en push a develop o dispatch manual)
+  # ─────────────────────────────────────────────────────────────────────────
+  apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: plan
+    environment: dev
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.accion == 'apply')
+
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+
+    steps:
+      - name: checkout del código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: autenticacion oidc con aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: terraform-apply-${{ github.run_id }}
+
+      - name: configurar terraform ${{ env.TF_VERSION }}
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: inicializar terraform con backend remoto
+        run: terraform init
+
+      - name: descargar plan aprobado del job anterior
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-${{ github.run_id }}
+          path: ${{ env.WORKING_DIR }}
+
+      - name: aplicar terraform plan
+        run: terraform apply -auto-approve -input=false tfplan
+        env:
+          TF_VAR_db_master_password: ${{ secrets.DB_MASTER_PASSWORD }}
+          TF_VAR_redis_auth_token: ${{ secrets.REDIS_AUTH_TOKEN }}
+
+      - name: mostrar outputs del despliegue
+        run: terraform output -json | jq '.'
