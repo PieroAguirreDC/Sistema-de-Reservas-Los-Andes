@@ -3,3 +3,20 @@
 **/.env.local
 **/.env
 **/dist/
+
+# ─── Terraform ───────────────────────────────────────────────────────────────
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/tfplan
+**/*.tfplan
+# NUNCA commitear archivos con secrets — solo terraform.tfvars (sin secrets) es seguro
+# Archivos de override locales
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
+# Logs de crash
+**/crash.log
+**/crash.*.log

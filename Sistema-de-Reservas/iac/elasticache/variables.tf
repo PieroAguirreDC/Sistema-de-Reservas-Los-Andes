@@ -66,3 +66,15 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+# ─── REDIS AUTH ───────────────────────────────────────────────────────────────
+variable "redis_auth_token" {
+  description = "Token de autenticación para Redis — mín. 16 chars, inyectar vía TF_VAR_redis_auth_token"
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.redis_auth_token) >= 16
+    error_message = "El redis_auth_token debe tener al menos 16 caracteres alfanuméricos."
+  }
+}

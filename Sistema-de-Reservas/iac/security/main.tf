@@ -110,6 +110,17 @@ resource "aws_secretsmanager_secret_version" "rds_credentials" {
   }
 }
 
+# CKV2_AWS_57: Rotación automática de credenciales cada 30 días
+# Usa el Lambda gestionado por AWS para Aurora PostgreSQL
+resource "aws_secretsmanager_secret_rotation" "rds_credentials" {
+  secret_id          = aws_secretsmanager_secret.rds_credentials.id
+  rotate_immediately = false
+
+  rotation_rules {
+    automatically_after_days = 30
+  }
+}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # ALB (recibe tráfico HTTPS desde internet)
 # ─────────────────────────────────────────────────────────────────────────────
