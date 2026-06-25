@@ -236,22 +236,16 @@ docker-compose up
 ## Variables de Entorno
 
 ### API (`app/api/.env`)
-
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_NAME=reservas_db
-NODE_ENV=development
-PORT=3000
+Crea un archivo `.env` en `app/api/` basándote en la plantilla:
+```bash
+cp app/api/.env.example app/api/.env
 ```
+Asegúrate de llenar las credenciales locales de base de datos antes de correr el proyecto.
 
 ### Web (`app/web/.env.local`)
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
-NEXT_PUBLIC_USE_MOCK=true
+Crea un archivo `.env.local` en `app/web/` basándote en la plantilla:
+```bash
+cp app/web/.env.example app/web/.env.local
 ```
 
 ---
@@ -282,8 +276,13 @@ NEXT_PUBLIC_USE_MOCK=true
 
 ## Notas Importantes
 
+> [!CAUTION]
+> **NUNCA subas credenciales, contraseñas, tokens o archivos `.env` al repositorio.**
+> Utiliza siempre variables de entorno locales o gestores de secretos (como AWS Secrets Manager). Existe un archivo `.env.example` que sirve como plantilla; cópialo localmente a `.env` y llénalo con tus datos.
+
 - El campo `password` en `aws_secretsmanager_secret_version` debe cambiarse antes del `terraform apply` en producción.
 - El puerto 3000 en el SG de ECS corresponde al puerto de los microservicios NestJS.
 - `synchronize: true` en TypeORM solo debe usarse en desarrollo, nunca en producción.
-- Los archivos `dist/` y `node_modules/` no se suben al repositorio (ver `.gitignore`).
+- Los archivos `dist/`, `node_modules/` y `.env` no se suben al repositorio (ver `.gitignore`).
 - Los archivos `test.tfvars` y `.terraform/` no se suben al repositorio.
+
