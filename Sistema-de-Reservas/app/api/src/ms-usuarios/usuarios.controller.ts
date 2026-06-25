@@ -1,9 +1,33 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  login(@Body() dto: LoginDto) {
+    return this.usuariosService.login(dto);
+  }
+
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  register(@Body() dto: CreateUsuarioDto) {
+    return this.usuariosService.register(dto);
+  }
 
   @Get()
   findAll() {
@@ -15,13 +39,8 @@ export class UsuariosController {
     return this.usuariosService.findOne(id);
   }
 
-  @Post()
-  create(@Body() body: object) {
-    return this.usuariosService.create(body);
-  }
-
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: object) {
+  update(@Param('id') id: string, @Body() body: Partial<CreateUsuarioDto>) {
     return this.usuariosService.update(id, body);
   }
 

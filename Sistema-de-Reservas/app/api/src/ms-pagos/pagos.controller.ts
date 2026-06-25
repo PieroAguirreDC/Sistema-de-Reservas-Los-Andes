@@ -1,13 +1,18 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller, Get, Post, Put, Delete,
+  Param, Body, Query,
+} from '@nestjs/common';
 import { PagosService } from './pagos.service';
+import { CreatePagoDto } from './dto/create-pago.dto';
+import { Pago } from './entities/pago.entity';
 
 @Controller('pagos')
 export class PagosController {
   constructor(private readonly pagosService: PagosService) {}
 
   @Get()
-  findAll() {
-    return this.pagosService.findAll();
+  findAll(@Query('reserva_id') reserva_id?: string) {
+    return this.pagosService.findAll(reserva_id);
   }
 
   @Get(':id')
@@ -16,12 +21,12 @@ export class PagosController {
   }
 
   @Post()
-  create(@Body() body: object) {
-    return this.pagosService.create(body);
+  create(@Body() dto: CreatePagoDto) {
+    return this.pagosService.create(dto);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: object) {
+  update(@Param('id') id: string, @Body() body: Partial<Pago>) {
     return this.pagosService.update(id, body);
   }
 

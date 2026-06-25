@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { HabitacionesService } from './habitaciones.service';
+import { CreateHabitacionDto } from './dto/create-habitacion.dto';
 
 @Controller('habitaciones')
 export class HabitacionesController {
@@ -16,12 +17,12 @@ export class HabitacionesController {
   }
 
   @Post()
-  create(@Body() body: object) {
-    return this.habitacionesService.create(body);
+  create(@Body() dto: CreateHabitacionDto) {
+    return this.habitacionesService.create(dto);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: object) {
+  update(@Param('id') id: string, @Body() body: Partial<CreateHabitacionDto>) {
     return this.habitacionesService.update(id, body);
   }
 
