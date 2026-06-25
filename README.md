@@ -6,7 +6,7 @@ Curso: Infraestructura como Código
 
 - Piero Aguirre
 - Rodrigo Baldeon
-- Grezia
+- Grezia Merino
 
 ---
 
@@ -231,25 +231,6 @@ docker build -t web .
 docker-compose up
 ```
 
----
-
-## Variables de Entorno
-
-### API (`app/api/.env`)
-Crea un archivo `.env` en `app/api/` basándote en la plantilla:
-```bash
-cp app/api/.env.example app/api/.env
-```
-Asegúrate de llenar las credenciales locales de base de datos antes de correr el proyecto.
-
-### Web (`app/web/.env.local`)
-Crea un archivo `.env.local` en `app/web/` basándote en la plantilla:
-```bash
-cp app/web/.env.example app/web/.env.local
-```
-
----
-
 ## Módulos API (NestJS)
 
 | Módulo | Ruta base | Descripción |
@@ -275,10 +256,6 @@ cp app/web/.env.example app/web/.env.local
 ---
 
 ## Notas Importantes
-
-> [!CAUTION]
-> **NUNCA subas credenciales, contraseñas, tokens o archivos `.env` al repositorio.**
-> Utiliza siempre variables de entorno locales o gestores de secretos (como AWS Secrets Manager). Existe un archivo `.env.example` que sirve como plantilla; cópialo localmente a `.env` y llénalo con tus datos.
 
 - El campo `password` en `aws_secretsmanager_secret_version` debe cambiarse antes del `terraform apply` en producción.
 - El puerto 3000 en el SG de ECS corresponde al puerto de los microservicios NestJS.
