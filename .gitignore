@@ -1,9 +1,13 @@
 **/node_modules/
 **/.next/
-**/.env.local
-**/.env
 **/dist/
 
+# ─── Secrets y Variables de Entorno ──────────────────────────────────────────
+# Ignorar todos los archivos de entorno
+**/.env*
+# Permitir explícitamente archivos de ejemplo/plantillas
+!**/.env.example
+!**/.env.template
 # ─── Terraform ───────────────────────────────────────────────────────────────
 **/.terraform/
 **/.terraform.lock.hcl
