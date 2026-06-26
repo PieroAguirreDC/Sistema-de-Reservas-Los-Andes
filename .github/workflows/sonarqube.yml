@@ -1,0 +1,60 @@
+name: SonarQube Analysis
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - "Sistema-de-Reservas/app/**"
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  sonarqube:
+    name: Analisis de calidad con SonarQube
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: Sistema-de-Reservas/app/api/package-lock.json
+
+      - name: Instalar dependencias de la API
+        working-directory: Sistema-de-Reservas/app/api
+        run: npm ci
+
+      - name: Ejecutar pruebas unitarias con cobertura
+        working-directory: Sistema-de-Reservas/app/api
+        run: npm run test:cov -- --passWithNoTests
+        continue-on-error: true
+
+      - name: Ejecutar analisis de SonarQube
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=hotel-losandes
+            -Dsonar.projectName="Sistema de Reservas Hotel Los Andes"
+            -Dsonar.sources=Sistema-de-Reservas/app/api/src,Sistema-de-Reservas/app/web/src
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/*.spec.ts,**/coverage/**
+            -Dsonar.typescript.tsconfigPath=Sistema-de-Reservas/app/api/tsconfig.json
+
+      - name: Verificar Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
