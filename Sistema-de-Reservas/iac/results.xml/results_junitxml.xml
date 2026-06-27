@@ -47,13 +47,20 @@
 		<testcase name="[NONE][CKV_AWS_163] Ensure ECR image scanning on push is enabled" classname="/ecr/main.tf.aws_ecr_repository.api" file="/ecr/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_163] Ensure ECR image scanning on push is enabled" classname="/ecr/main.tf.aws_ecr_repository.web" file="/ecr/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/ecs-fargate/main.tf.aws.default" file="/ecs-fargate/main.tf"/>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_60] Ensure IAM role allows only specific services or principals to assume it" classname="/ecs-fargate/main.tf.aws_iam_role.ecs_execution" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_61] Ensure AWS IAM policy does not allow assume role permission across all services" classname="/ecs-fargate/main.tf.aws_iam_role.ecs_execution" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_393] Ensure AWS GitHub Actions OIDC authorization policies only allow safe claims and claim order on IAM role" classname="/ecs-fargate/main.tf.aws_iam_role.ecs_execution" file="/ecs-fargate/main.tf"/>
+=======
+		<testcase name="[NONE][CKV_AWS_393] Ensure AWS GitHub Actions OIDC authorization policies only allow safe claims and claim order on IAM role" classname="/ecs-fargate/main.tf.aws_iam_role.ecs_execution" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_61] Ensure AWS IAM policy does not allow assume role permission across all services" classname="/ecs-fargate/main.tf.aws_iam_role.ecs_execution" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_60] Ensure IAM role allows only specific services or principals to assume it" classname="/ecs-fargate/main.tf.aws_iam_role.ecs_execution" file="/ecs-fargate/main.tf"/>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_274] Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy" classname="/ecs-fargate/main.tf.aws_iam_role.ecs_execution" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_274] Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy" classname="/ecs-fargate/main.tf.aws_iam_role_policy_attachment.ecs_execution" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_66] Ensure that CloudWatch Log Group specifies retention days" classname="/ecs-fargate/main.tf.aws_cloudwatch_log_group.api" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_66] Ensure that CloudWatch Log Group specifies retention days" classname="/ecs-fargate/main.tf.aws_cloudwatch_log_group.web" file="/ecs-fargate/main.tf"/>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_65] Ensure container insights are enabled on ECS cluster" classname="/ecs-fargate/main.tf.aws_ecs_cluster.main" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_223] Ensure ECS Cluster enables logging of ECS Exec" classname="/ecs-fargate/main.tf.aws_ecs_cluster.main" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_249] Ensure that the Execution Role ARN and the Task Role ARN are different in ECS Task definitions" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.api" file="/ecs-fargate/main.tf"/>
@@ -71,10 +78,30 @@
 		<testcase name="[NONE][CKV_AWS_31] Ensure all data stored in the ElastiCache Replication Group is securely encrypted at transit and has auth token" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_30] Ensure all data stored in the ElastiCache Replication Group is securely encrypted at transit" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_29] Ensure all data stored in the ElastiCache Replication Group is securely encrypted at rest" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
+=======
+		<testcase name="[NONE][CKV_AWS_223] Ensure ECS Cluster enables logging of ECS Exec" classname="/ecs-fargate/main.tf.aws_ecs_cluster.main" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_65] Ensure container insights are enabled on ECS cluster" classname="/ecs-fargate/main.tf.aws_ecs_cluster.main" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_334] Ensure ECS containers should run as non-privileged" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.api" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_97] Ensure Encryption in transit is enabled for EFS volumes in ECS Task definitions" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.api" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_249] Ensure that the Execution Role ARN and the Task Role ARN are different in ECS Task definitions" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.api" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_335] Ensure ECS task definitions should not share the host's process namespace" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.api" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_334] Ensure ECS containers should run as non-privileged" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.web" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_97] Ensure Encryption in transit is enabled for EFS volumes in ECS Task definitions" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.web" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_249] Ensure that the Execution Role ARN and the Task Role ARN are different in ECS Task definitions" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.web" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_335] Ensure ECS task definitions should not share the host's process namespace" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.web" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_332] Ensure ECS Fargate services run on the latest Fargate platform version" classname="/ecs-fargate/main.tf.aws_ecs_service.api" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_333] Ensure ECS services do not have public IP addresses assigned to them automatically" classname="/ecs-fargate/main.tf.aws_ecs_service.api" file="/ecs-fargate/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/elasticache/main.tf.aws.default" file="/elasticache/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_30] Ensure all data stored in the ElastiCache Replication Group is securely encrypted at transit" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_29] Ensure all data stored in the ElastiCache Replication Group is securely encrypted at rest" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_191] Ensure ElastiCache replication group is encrypted by KMS using a customer managed Key (CMK)" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_31] Ensure all data stored in the ElastiCache Replication Group is securely encrypted at transit and has auth token" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/messaging/main.tf.aws.default" file="/messaging/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_26] Ensure all data stored in the SNS topic is encrypted" classname="/messaging/main.tf.aws_sns_topic.reservas" file="/messaging/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_26] Ensure all data stored in the SNS topic is encrypted" classname="/messaging/main.tf.aws_sns_topic.pagos" file="/messaging/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_26] Ensure all data stored in the SNS topic is encrypted" classname="/messaging/main.tf.aws_sns_topic.auditoria" file="/messaging/main.tf"/>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.reservas_notificaciones_dlq" file="/messaging/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.reservas_notificaciones_dlq" file="/messaging/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.pagos_notificaciones_dlq" file="/messaging/main.tf"/>
@@ -103,12 +130,43 @@
 		<testcase name="[NONE][CKV_AWS_72] Ensure SQS policy does not allow ALL (*) actions." classname="/messaging/main.tf.aws_sqs_queue_policy.auditoria" file="/messaging/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue_policy.auditoria" file="/messaging/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_387] Ensure SQS policy does not allow public access through wildcards" classname="/messaging/main.tf.aws_sqs_queue_policy.auditoria" file="/messaging/main.tf"/>
+=======
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.reservas_notificaciones_dlq" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.reservas_notificaciones_dlq" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.pagos_notificaciones_dlq" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.pagos_notificaciones_dlq" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.reservas_pagos_dlq" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.reservas_pagos_dlq" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.auditoria_dlq" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.auditoria_dlq" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.reservas_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.reservas_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.pagos_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.pagos_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.reservas_pagos" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.reservas_pagos" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue.auditoria" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_27] Ensure all data stored in the SQS queue is encrypted" classname="/messaging/main.tf.aws_sqs_queue.auditoria" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_387] Ensure SQS policy does not allow public access through wildcards" classname="/messaging/main.tf.aws_sqs_queue_policy.reservas_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue_policy.reservas_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_72] Ensure SQS policy does not allow ALL (*) actions." classname="/messaging/main.tf.aws_sqs_queue_policy.reservas_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_387] Ensure SQS policy does not allow public access through wildcards" classname="/messaging/main.tf.aws_sqs_queue_policy.pagos_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue_policy.pagos_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_72] Ensure SQS policy does not allow ALL (*) actions." classname="/messaging/main.tf.aws_sqs_queue_policy.pagos_notificaciones" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_387] Ensure SQS policy does not allow public access through wildcards" classname="/messaging/main.tf.aws_sqs_queue_policy.reservas_pagos" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue_policy.reservas_pagos" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_72] Ensure SQS policy does not allow ALL (*) actions." classname="/messaging/main.tf.aws_sqs_queue_policy.reservas_pagos" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_387] Ensure SQS policy does not allow public access through wildcards" classname="/messaging/main.tf.aws_sqs_queue_policy.auditoria" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_168] Ensure SQS queue policy is not public by only allowing specific services or principals to access it" classname="/messaging/main.tf.aws_sqs_queue_policy.auditoria" file="/messaging/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_72] Ensure SQS policy does not allow ALL (*) actions." classname="/messaging/main.tf.aws_sqs_queue_policy.auditoria" file="/messaging/main.tf"/>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/monitoring/main.tf.aws.default" file="/monitoring/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_319] Ensure that CloudWatch alarm actions are enabled" classname="/monitoring/main.tf.aws_cloudwatch_metric_alarm.ecs_api_cpu" file="/monitoring/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_319] Ensure that CloudWatch alarm actions are enabled" classname="/monitoring/main.tf.aws_cloudwatch_metric_alarm.ecs_api_memory" file="/monitoring/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_319] Ensure that CloudWatch alarm actions are enabled" classname="/monitoring/main.tf.aws_cloudwatch_metric_alarm.ecs_web_cpu" file="/monitoring/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_319] Ensure that CloudWatch alarm actions are enabled" classname="/monitoring/main.tf.aws_cloudwatch_metric_alarm.alb_5xx" file="/monitoring/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/rds/main.tf.aws.default" file="/rds/main.tf"/>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_324] Ensure that RDS Cluster log capture is enabled" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_162] Ensure RDS cluster has IAM authentication enabled" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_250] Ensure that RDS PostgreSQL instances use a non vulnerable version with the log_fdw extension (https://aws.amazon.com/security/security-bulletins/AWS-2022-004/)" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
@@ -148,10 +206,52 @@
 		<testcase name="[NONE][CKV_AWS_60] Ensure IAM role allows only specific services or principals to assume it" classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_61] Ensure AWS IAM policy does not allow assume role permission across all services" classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_393] Ensure AWS GitHub Actions OIDC authorization policies only allow safe claims and claim order on IAM role" classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
+=======
+		<testcase name="[NONE][CKV_AWS_133] Ensure that RDS instances has backup policy" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_250] Ensure that RDS PostgreSQL instances use a non vulnerable version with the log_fdw extension (https://aws.amazon.com/security/security-bulletins/AWS-2022-004/)" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_96] Ensure all data stored in Aurora is securely encrypted at rest" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_139] Ensure that RDS clusters have deletion protection enabled" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_313] Ensure RDS cluster configured to copy tags to snapshots" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_162] Ensure RDS cluster has IAM authentication enabled" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_324] Ensure that RDS Cluster log capture is enabled" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_327] Ensure RDS Clusters are encrypted using KMS CMKs" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_226] Ensure DB instance gets all minor upgrades automatically" classname="/rds/main.tf.aws_rds_cluster_instance.primary" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_17] Ensure all data stored in RDS is not publicly accessible" classname="/rds/main.tf.aws_rds_cluster_instance.primary" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_354] Ensure RDS Performance Insights are encrypted using KMS CMKs" classname="/rds/main.tf.aws_rds_cluster_instance.primary" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_353] Ensure that RDS instances have performance insights enabled" classname="/rds/main.tf.aws_rds_cluster_instance.primary" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_118] Ensure that enhanced monitoring is enabled for Amazon RDS instances" classname="/rds/main.tf.aws_rds_cluster_instance.primary" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_226] Ensure DB instance gets all minor upgrades automatically" classname="/rds/main.tf.aws_rds_cluster_instance.standby" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_17] Ensure all data stored in RDS is not publicly accessible" classname="/rds/main.tf.aws_rds_cluster_instance.standby" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_354] Ensure RDS Performance Insights are encrypted using KMS CMKs" classname="/rds/main.tf.aws_rds_cluster_instance.standby" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_353] Ensure that RDS instances have performance insights enabled" classname="/rds/main.tf.aws_rds_cluster_instance.standby" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_118] Ensure that enhanced monitoring is enabled for Amazon RDS instances" classname="/rds/main.tf.aws_rds_cluster_instance.standby" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_393] Ensure AWS GitHub Actions OIDC authorization policies only allow safe claims and claim order on IAM role" classname="/rds/main.tf.aws_iam_role.rds_enhanced_monitoring" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_61] Ensure AWS IAM policy does not allow assume role permission across all services" classname="/rds/main.tf.aws_iam_role.rds_enhanced_monitoring" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_60] Ensure IAM role allows only specific services or principals to assume it" classname="/rds/main.tf.aws_iam_role.rds_enhanced_monitoring" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_274] Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy" classname="/rds/main.tf.aws_iam_role.rds_enhanced_monitoring" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_274] Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy" classname="/rds/main.tf.aws_iam_role_policy_attachment.rds_enhanced_monitoring" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_393] Ensure AWS GitHub Actions OIDC authorization policies only allow safe claims and claim order on IAM role" classname="/rds/main.tf.aws_iam_role.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_61] Ensure AWS IAM policy does not allow assume role permission across all services" classname="/rds/main.tf.aws_iam_role.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_60] Ensure IAM role allows only specific services or principals to assume it" classname="/rds/main.tf.aws_iam_role.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_274] Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy" classname="/rds/main.tf.aws_iam_role.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_290] Ensure IAM policies does not allow write access without constraints" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_286] Ensure IAM policies does not allow privilege escalation" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_287] Ensure IAM policies does not allow credentials exposure" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_355] Ensure no IAM policies documents allow &quot;*&quot; as a statement's resource for restrictable actions" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_288] Ensure IAM policies does not allow data exfiltration" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_62] Ensure IAM policies that allow full &quot;*-*&quot; administrative privileges are not created" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_63] Ensure no IAM policies documents allow &quot;*&quot; as a statement's actions" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_289] Ensure IAM policies does not allow permissions management / resource exposure without constraints" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_166] Ensure Backup Vault is encrypted at rest using KMS CMK" classname="/rds/main.tf.aws_backup_vault.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_393] Ensure AWS GitHub Actions OIDC authorization policies only allow safe claims and claim order on IAM role" classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_61] Ensure AWS IAM policy does not allow assume role permission across all services" classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_60] Ensure IAM role allows only specific services or principals to assume it" classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_274] Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy" classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_274] Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy" classname="/rds/main.tf.aws_iam_role_policy_attachment.aws_backup" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/security/main.tf.aws.default" file="/security/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_227] Ensure KMS key is enabled" classname="/security/main.tf.aws_kms_key.main" file="/security/main.tf"/>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_33] Ensure KMS key policy does not contain wildcard (*) principal" classname="/security/main.tf.aws_kms_key.main" file="/security/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_7] Ensure rotation for customer created CMKs is enabled" classname="/security/main.tf.aws_kms_key.main" file="/security/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_149] Ensure that Secrets Manager secret is encrypted using KMS CMK" classname="/security/main.tf.aws_secretsmanager_secret.rds_credentials" file="/security/main.tf"/>
@@ -179,10 +279,40 @@
 		<testcase name="[NONE][CKV_AWS_25] Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_382] Ensure no security groups allow egress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_260] Ensure no security groups allow ingress from 0.0.0.0:0 to port 80" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
+=======
+		<testcase name="[NONE][CKV_AWS_7] Ensure rotation for customer created CMKs is enabled" classname="/security/main.tf.aws_kms_key.main" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_33] Ensure KMS key policy does not contain wildcard (*) principal" classname="/security/main.tf.aws_kms_key.main" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_149] Ensure that Secrets Manager secret is encrypted using KMS CMK" classname="/security/main.tf.aws_secretsmanager_secret.rds_credentials" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_304] Ensure Secrets Manager secrets should be rotated within 90 days" classname="/security/main.tf.aws_secretsmanager_secret_rotation.rds_credentials" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_25] Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389" classname="/security/main.tf.aws_security_group.alb" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_23] Ensure every security group and rule has a description" classname="/security/main.tf.aws_security_group.alb" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_24] Ensure no security groups allow ingress from 0.0.0.0:0 to port 22" classname="/security/main.tf.aws_security_group.alb" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_382] Ensure no security groups allow egress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.alb" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_277] Ensure no security groups allow ingress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.alb" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_25] Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389" classname="/security/main.tf.aws_security_group.ecs" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_23] Ensure every security group and rule has a description" classname="/security/main.tf.aws_security_group.ecs" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_24] Ensure no security groups allow ingress from 0.0.0.0:0 to port 22" classname="/security/main.tf.aws_security_group.ecs" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_382] Ensure no security groups allow egress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.ecs" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_260] Ensure no security groups allow ingress from 0.0.0.0:0 to port 80" classname="/security/main.tf.aws_security_group.ecs" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_277] Ensure no security groups allow ingress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.ecs" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_25] Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389" classname="/security/main.tf.aws_security_group.rds" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_23] Ensure every security group and rule has a description" classname="/security/main.tf.aws_security_group.rds" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_24] Ensure no security groups allow ingress from 0.0.0.0:0 to port 22" classname="/security/main.tf.aws_security_group.rds" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_382] Ensure no security groups allow egress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.rds" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_260] Ensure no security groups allow ingress from 0.0.0.0:0 to port 80" classname="/security/main.tf.aws_security_group.rds" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_277] Ensure no security groups allow ingress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.rds" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_25] Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_23] Ensure every security group and rule has a description" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_24] Ensure no security groups allow ingress from 0.0.0.0:0 to port 22" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_382] Ensure no security groups allow egress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_260] Ensure no security groups allow ingress from 0.0.0.0:0 to port 80" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_277] Ensure no security groups allow ingress from 0.0.0.0:0 to port -1" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf"/>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/vpc/main.tf.aws.default" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.public[0]" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.private_app[0]" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.private_db[0]" file="/vpc/main.tf"/>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_23] Ensure every security group and rule has a description" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_277] Ensure no security groups allow ingress from 0.0.0.0:0 to port -1" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_24] Ensure no security groups allow ingress from 0.0.0.0:0 to port 22" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
@@ -205,6 +335,33 @@
 		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.public[1]" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.private_app[1]" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.private_db[1]" file="/vpc/main.tf"/>
+=======
+		<testcase name="[NONE][CKV_AWS_25] Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_23] Ensure every security group and rule has a description" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_24] Ensure no security groups allow ingress from 0.0.0.0:0 to port 22" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_382] Ensure no security groups allow egress from 0.0.0.0:0 to port -1" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_260] Ensure no security groups allow ingress from 0.0.0.0:0 to port 80" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_277] Ensure no security groups allow ingress from 0.0.0.0:0 to port -1" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_66] Ensure that CloudWatch Log Group specifies retention days" classname="/vpc/main.tf.aws_cloudwatch_log_group.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_393] Ensure AWS GitHub Actions OIDC authorization policies only allow safe claims and claim order on IAM role" classname="/vpc/main.tf.aws_iam_role.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_61] Ensure AWS IAM policy does not allow assume role permission across all services" classname="/vpc/main.tf.aws_iam_role.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_60] Ensure IAM role allows only specific services or principals to assume it" classname="/vpc/main.tf.aws_iam_role.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_274] Disallow IAM roles, users, and groups from using the AWS AdministratorAccess policy" classname="/vpc/main.tf.aws_iam_role.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_290] Ensure IAM policies does not allow write access without constraints" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_286] Ensure IAM policies does not allow privilege escalation" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_287] Ensure IAM policies does not allow credentials exposure" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_355] Ensure no IAM policies documents allow &quot;*&quot; as a statement's resource for restrictable actions" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_288] Ensure IAM policies does not allow data exfiltration" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_62] Ensure IAM policies that allow full &quot;*-*&quot; administrative privileges are not created" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_63] Ensure no IAM policies documents allow &quot;*&quot; as a statement's actions" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_289] Ensure IAM policies does not allow permissions management / resource exposure without constraints" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.public[1]" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.private_app[1]" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_130] Ensure VPC subnets do not assign public IP by default" classname="/vpc/main.tf.aws_subnet.private_db[1]" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_77] Ensure AWS API Gateway Rest API attached WAFv2 WebACL is configured with AMR for Log4j Vulnerability" classname="/api-gateway/main.tf.aws_apigatewayv2_api.main" file="/api-gateway/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_57] Ensure Secrets Manager secrets should have automatic rotation enabled" classname="/security/main.tf.aws_secretsmanager_secret.rds_credentials" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_76] Ensure AWS ALB attached WAFv2 WebACL is configured with AMR for Log4j Vulnerability" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf"/>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/ecs-fargate/main.tf.aws_iam_role.ecs_execution" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/ecs-fargate/main.tf.aws_iam_role_policy_attachment.ecs_execution" file="/ecs-fargate/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/rds/main.tf.aws_iam_role.rds_enhanced_monitoring" file="/rds/main.tf"/>
@@ -213,6 +370,7 @@
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/rds/main.tf.aws_iam_role_policy_attachment.aws_backup" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/vpc/main.tf.aws_iam_role.vpc_flow_logs" file="/vpc/main.tf"/>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV2_AWS_76] Ensure AWS ALB attached WAFv2 WebACL is configured with AMR for Log4j Vulnerability" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_74] Ensure AWS Load Balancers use strong ciphers" classname="/alb/main.tf.aws_lb_listener.http" file="/alb/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_74] Ensure AWS Load Balancers use strong ciphers" classname="/alb/main.tf.aws_lb_listener.https" file="/alb/main.tf"/>
@@ -238,6 +396,30 @@
 		<testcase name="[NONE][CKV2_AWS_5] Ensure that Security Groups are attached to another resource" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_378] Ensure AWS Load Balancer doesn't use HTTP protocol" classname="/alb/main.tf.aws_lb_target_group.api" file="/alb/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_378] Ensure AWS Load Balancer doesn't use HTTP protocol" classname="/alb/main.tf.aws_lb_target_group.web" file="/alb/main.tf"/>
+=======
+		<testcase name="[NONE][CKV_AWS_378] Ensure AWS Load Balancer doesn't use HTTP protocol" classname="/alb/main.tf.aws_lb_target_group.api" file="/alb/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_378] Ensure AWS Load Balancer doesn't use HTTP protocol" classname="/alb/main.tf.aws_lb_target_group.web" file="/alb/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_44] Ensure AWS route table with VPC peering does not contain routes overly permissive to all traffic" classname="/vpc/main.tf.aws_route_table.public" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_44] Ensure AWS route table with VPC peering does not contain routes overly permissive to all traffic" classname="/vpc/main.tf.aws_route_table.private_app" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_44] Ensure AWS route table with VPC peering does not contain routes overly permissive to all traffic" classname="/vpc/main.tf.aws_route_table.private_db" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_5] Ensure that Security Groups are attached to another resource" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_35] AWS NAT Gateways should be utilized for the default route" classname="/vpc/main.tf.aws_route_table.public" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_35] AWS NAT Gateways should be utilized for the default route" classname="/vpc/main.tf.aws_route_table.private_app" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_35] AWS NAT Gateways should be utilized for the default route" classname="/vpc/main.tf.aws_route_table.private_db" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_74] Ensure AWS Load Balancers use strong ciphers" classname="/alb/main.tf.aws_lb_listener.http" file="/alb/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_74] Ensure AWS Load Balancers use strong ciphers" classname="/alb/main.tf.aws_lb_listener.https" file="/alb/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_27] Ensure Postgres RDS as aws_rds_cluster has Query Logging enabled" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_50] Ensure AWS ElastiCache Redis cluster with Multi-AZ Automatic Failover feature set to enabled" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_8] Ensure that RDS clusters has backup plan of AWS Backup" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_103] Ensure that load balancer is using at least TLS 1.2" classname="/alb/main.tf.aws_lb_listener.https" file="/alb/main.tf"/>
+		<testcase name="[NONE][CKV_AWS_103] Ensure that load balancer is using at least TLS 1.2" classname="/alb/main.tf.aws_lb_listener.http" file="/alb/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_51] Ensure AWS API Gateway endpoints uses client certificate authentication" classname="/api-gateway/main.tf.aws_apigatewayv2_stage.default" file="/api-gateway/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_11] Ensure VPC flow logging is enabled in all VPCs" classname="/vpc/main.tf.aws_vpc.main" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_40] Ensure AWS IAM policy does not allow full IAM privileges" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_40] Ensure AWS IAM policy does not allow full IAM privileges" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_64] Ensure KMS key Policy is defined" classname="/security/main.tf.aws_kms_key.main" file="/security/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_12] Ensure the default security group of every VPC restricts all traffic" classname="/vpc/main.tf.aws_vpc.main" file="/vpc/main.tf"/>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_150] Ensure that Load Balancer has deletion protection enabled" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
 			<failure type="failure" message="Ensure that Load Balancer has deletion protection enabled">
 Resource: aws_lb.main
@@ -259,11 +441,19 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		45 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_131] Ensure that ALB drops HTTP headers" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
 			<failure type="failure" message="Ensure that ALB drops HTTP headers">
 Resource: aws_lb.main
 File: /alb/main.tf: 33-45
 Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-alb-drops-http-headers
+=======
+		<testcase name="[NONE][CKV_AWS_91] Ensure the ELBv2 (Application/Network) has access logging enabled" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
+			<failure type="failure" message="Ensure the ELBv2 (Application/Network) has access logging enabled">
+Resource: aws_lb.main
+File: /alb/main.tf: 33-45
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/bc-aws-logging-22
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 
 		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
 		34 |   name               = &quot;${local.name_prefix}-alb&quot;
@@ -280,11 +470,19 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		45 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_91] Ensure the ELBv2 (Application/Network) has access logging enabled" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
 			<failure type="failure" message="Ensure the ELBv2 (Application/Network) has access logging enabled">
 Resource: aws_lb.main
 File: /alb/main.tf: 33-45
 Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/bc-aws-logging-22
+=======
+		<testcase name="[NONE][CKV_AWS_131] Ensure that ALB drops HTTP headers" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
+			<failure type="failure" message="Ensure that ALB drops HTTP headers">
+Resource: aws_lb.main
+File: /alb/main.tf: 33-45
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-alb-drops-http-headers
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 
 		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
 		34 |   name               = &quot;${local.name_prefix}-alb&quot;
@@ -336,6 +534,7 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		60 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_158] Ensure that CloudWatch Log Group is encrypted by KMS" classname="/api-gateway/main.tf.aws_cloudwatch_log_group.api_gw" file="/api-gateway/main.tf">
 			<failure type="failure" message="Ensure that CloudWatch Log Group is encrypted by KMS">
 Resource: aws_cloudwatch_log_group.api_gw
@@ -347,6 +546,8 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		77 |   retention_in_days = 7
 		78 | }</failure>
 		</testcase>
+=======
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_338] Ensure CloudWatch log groups retains logs for at least 1 year" classname="/api-gateway/main.tf.aws_cloudwatch_log_group.api_gw" file="/api-gateway/main.tf">
 			<failure type="failure" message="Ensure CloudWatch log groups retains logs for at least 1 year">
 Resource: aws_cloudwatch_log_group.api_gw
@@ -358,6 +559,7 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		77 |   retention_in_days = 7
 		78 | }</failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_51] Ensure ECR Image Tags are immutable" classname="/ecr/main.tf.aws_ecr_repository.api" file="/ecr/main.tf">
 			<failure type="failure" message="Ensure ECR Image Tags are immutable">
 Resource: aws_ecr_repository.api
@@ -375,6 +577,18 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		36 |   tags = { Name = &quot;${local.name_prefix}-api&quot; }
 		37 | }
 </failure>
+=======
+		<testcase name="[NONE][CKV_AWS_158] Ensure that CloudWatch Log Group is encrypted by KMS" classname="/api-gateway/main.tf.aws_cloudwatch_log_group.api_gw" file="/api-gateway/main.tf">
+			<failure type="failure" message="Ensure that CloudWatch Log Group is encrypted by KMS">
+Resource: aws_cloudwatch_log_group.api_gw
+File: /api-gateway/main.tf: 75-78
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-cloudwatch-log-group-is-encrypted-by-kms
+
+		75 | resource &quot;aws_cloudwatch_log_group&quot; &quot;api_gw&quot; {
+		76 |   name              = &quot;/aws/apigateway/${local.name_prefix}&quot;
+		77 |   retention_in_days = 7
+		78 | }</failure>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		</testcase>
 		<testcase name="[NONE][CKV_AWS_136] Ensure that ECR repositories are encrypted using KMS" classname="/ecr/main.tf.aws_ecr_repository.api" file="/ecr/main.tf">
 			<failure type="failure" message="Ensure that ECR repositories are encrypted using KMS">
@@ -394,6 +608,7 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		37 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_51] Ensure ECR Image Tags are immutable" classname="/ecr/main.tf.aws_ecr_repository.web" file="/ecr/main.tf">
 			<failure type="failure" message="Ensure ECR Image Tags are immutable">
 Resource: aws_ecr_repository.web
@@ -410,6 +625,24 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		46 | 
 		47 |   tags = { Name = &quot;${local.name_prefix}-web&quot; }
 		48 | }
+=======
+		<testcase name="[NONE][CKV_AWS_51] Ensure ECR Image Tags are immutable" classname="/ecr/main.tf.aws_ecr_repository.api" file="/ecr/main.tf">
+			<failure type="failure" message="Ensure ECR Image Tags are immutable">
+Resource: aws_ecr_repository.api
+File: /ecr/main.tf: 28-37
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/bc-aws-general-24
+
+		28 | resource &quot;aws_ecr_repository&quot; &quot;api&quot; {
+		29 |   name                 = &quot;${local.name_prefix}/api&quot;
+		30 |   image_tag_mutability = &quot;MUTABLE&quot;
+		31 | 
+		32 |   image_scanning_configuration {
+		33 |     scan_on_push = true
+		34 |   }
+		35 | 
+		36 |   tags = { Name = &quot;${local.name_prefix}-api&quot; }
+		37 | }
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 </failure>
 		</testcase>
 		<testcase name="[NONE][CKV_AWS_136] Ensure that ECR repositories are encrypted using KMS" classname="/ecr/main.tf.aws_ecr_repository.web" file="/ecr/main.tf">
@@ -430,6 +663,7 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		48 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_158] Ensure that CloudWatch Log Group is encrypted by KMS" classname="/ecs-fargate/main.tf.aws_cloudwatch_log_group.api" file="/ecs-fargate/main.tf">
 			<failure type="failure" message="Ensure that CloudWatch Log Group is encrypted by KMS">
 Resource: aws_cloudwatch_log_group.api
@@ -440,6 +674,24 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		47 |   name              = &quot;/ecs/${local.name_prefix}/api&quot;
 		48 |   retention_in_days = 7
 		49 | }
+=======
+		<testcase name="[NONE][CKV_AWS_51] Ensure ECR Image Tags are immutable" classname="/ecr/main.tf.aws_ecr_repository.web" file="/ecr/main.tf">
+			<failure type="failure" message="Ensure ECR Image Tags are immutable">
+Resource: aws_ecr_repository.web
+File: /ecr/main.tf: 39-48
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/bc-aws-general-24
+
+		39 | resource &quot;aws_ecr_repository&quot; &quot;web&quot; {
+		40 |   name                 = &quot;${local.name_prefix}/web&quot;
+		41 |   image_tag_mutability = &quot;MUTABLE&quot;
+		42 | 
+		43 |   image_scanning_configuration {
+		44 |     scan_on_push = true
+		45 |   }
+		46 | 
+		47 |   tags = { Name = &quot;${local.name_prefix}-web&quot; }
+		48 | }
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 </failure>
 		</testcase>
 		<testcase name="[NONE][CKV_AWS_338] Ensure CloudWatch log groups retains logs for at least 1 year" classname="/ecs-fargate/main.tf.aws_cloudwatch_log_group.api" file="/ecs-fargate/main.tf">
@@ -454,6 +706,7 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		49 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_158] Ensure that CloudWatch Log Group is encrypted by KMS" classname="/ecs-fargate/main.tf.aws_cloudwatch_log_group.web" file="/ecs-fargate/main.tf">
 			<failure type="failure" message="Ensure that CloudWatch Log Group is encrypted by KMS">
 Resource: aws_cloudwatch_log_group.web
@@ -464,6 +717,18 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		52 |   name              = &quot;/ecs/${local.name_prefix}/web&quot;
 		53 |   retention_in_days = 7
 		54 | }
+=======
+		<testcase name="[NONE][CKV_AWS_158] Ensure that CloudWatch Log Group is encrypted by KMS" classname="/ecs-fargate/main.tf.aws_cloudwatch_log_group.api" file="/ecs-fargate/main.tf">
+			<failure type="failure" message="Ensure that CloudWatch Log Group is encrypted by KMS">
+Resource: aws_cloudwatch_log_group.api
+File: /ecs-fargate/main.tf: 46-49
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-cloudwatch-log-group-is-encrypted-by-kms
+
+		46 | resource &quot;aws_cloudwatch_log_group&quot; &quot;api&quot; {
+		47 |   name              = &quot;/ecs/${local.name_prefix}/api&quot;
+		48 |   retention_in_days = 7
+		49 | }
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 </failure>
 		</testcase>
 		<testcase name="[NONE][CKV_AWS_338] Ensure CloudWatch log groups retains logs for at least 1 year" classname="/ecs-fargate/main.tf.aws_cloudwatch_log_group.web" file="/ecs-fargate/main.tf">
@@ -478,6 +743,21 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		54 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
+=======
+		<testcase name="[NONE][CKV_AWS_158] Ensure that CloudWatch Log Group is encrypted by KMS" classname="/ecs-fargate/main.tf.aws_cloudwatch_log_group.web" file="/ecs-fargate/main.tf">
+			<failure type="failure" message="Ensure that CloudWatch Log Group is encrypted by KMS">
+Resource: aws_cloudwatch_log_group.web
+File: /ecs-fargate/main.tf: 51-54
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-cloudwatch-log-group-is-encrypted-by-kms
+
+		51 | resource &quot;aws_cloudwatch_log_group&quot; &quot;web&quot; {
+		52 |   name              = &quot;/ecs/${local.name_prefix}/web&quot;
+		53 |   retention_in_days = 7
+		54 | }
+</failure>
+		</testcase>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_336] Ensure ECS containers are limited to read-only access to root filesystems" classname="/ecs-fargate/main.tf.aws_ecs_task_definition.api" file="/ecs-fargate/main.tf">
 			<failure type="failure" message="Ensure ECS containers are limited to read-only access to root filesystems">
 Resource: aws_ecs_task_definition.api
@@ -606,6 +886,7 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		159 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV_AWS_158] Ensure that CloudWatch Log Group is encrypted by KMS" classname="/vpc/main.tf.aws_cloudwatch_log_group.vpc_flow_logs" file="/vpc/main.tf">
 			<failure type="failure" message="Ensure that CloudWatch Log Group is encrypted by KMS">
 Resource: aws_cloudwatch_log_group.vpc_flow_logs
@@ -622,6 +903,8 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		273 | }
 </failure>
 		</testcase>
+=======
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 		<testcase name="[NONE][CKV_AWS_338] Ensure CloudWatch log groups retains logs for at least 1 year" classname="/vpc/main.tf.aws_cloudwatch_log_group.vpc_flow_logs" file="/vpc/main.tf">
 			<failure type="failure" message="Ensure CloudWatch log groups retains logs for at least 1 year">
 Resource: aws_cloudwatch_log_group.vpc_flow_logs
@@ -638,6 +921,7 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		273 | }
 </failure>
 		</testcase>
+<<<<<<< HEAD
 		<testcase name="[NONE][CKV2_AWS_20] Ensure that ALB redirects HTTP requests into HTTPS ones" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
 			<failure type="failure" message="Ensure that ALB redirects HTTP requests into HTTPS ones">
 Resource: aws_lb.main
@@ -678,6 +962,22 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		43 |     Name = &quot;${local.name_prefix}-alb&quot;
 		44 |   }
 		45 | }
+=======
+		<testcase name="[NONE][CKV_AWS_158] Ensure that CloudWatch Log Group is encrypted by KMS" classname="/vpc/main.tf.aws_cloudwatch_log_group.vpc_flow_logs" file="/vpc/main.tf">
+			<failure type="failure" message="Ensure that CloudWatch Log Group is encrypted by KMS">
+Resource: aws_cloudwatch_log_group.vpc_flow_logs
+File: /vpc/main.tf: 266-273
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-cloudwatch-log-group-is-encrypted-by-kms
+
+		266 | resource &quot;aws_cloudwatch_log_group&quot; &quot;vpc_flow_logs&quot; {
+		267 |   name              = &quot;/aws/vpc/flowlogs/${local.name_prefix}&quot;
+		268 |   retention_in_days = 30
+		269 | 
+		270 |   tags = {
+		271 |     Name = &quot;${local.name_prefix}-vpc-flow-logs&quot;
+		272 |   }
+		273 | }
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 </failure>
 		</testcase>
 		<testcase name="[NONE][CKV2_AWS_5] Ensure that Security Groups are attached to another resource" classname="/security/main.tf.aws_security_group.alb" file="/security/main.tf">
@@ -819,5 +1119,50 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		245 |   }
 		246 | }</failure>
 		</testcase>
+<<<<<<< HEAD
+=======
+		<testcase name="[NONE][CKV2_AWS_28] Ensure public facing ALB are protected by WAF" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
+			<failure type="failure" message="Ensure public facing ALB are protected by WAF">
+Resource: aws_lb.main
+File: /alb/main.tf: 33-45
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-public-facing-alb-are-protected-by-waf
+
+		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
+		34 |   name               = &quot;${local.name_prefix}-alb&quot;
+		35 |   internal           = false
+		36 |   load_balancer_type = &quot;application&quot;
+		37 |   security_groups    = [var.sg_alb_id]
+		38 |   subnets            = var.public_subnet_ids
+		39 | 
+		40 |   enable_deletion_protection = var.environment == &quot;prod&quot; ? true : false
+		41 | 
+		42 |   tags = {
+		43 |     Name = &quot;${local.name_prefix}-alb&quot;
+		44 |   }
+		45 | }
+</failure>
+		</testcase>
+		<testcase name="[NONE][CKV2_AWS_20] Ensure that ALB redirects HTTP requests into HTTPS ones" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
+			<failure type="failure" message="Ensure that ALB redirects HTTP requests into HTTPS ones">
+Resource: aws_lb.main
+File: /alb/main.tf: 33-45
+Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-alb-redirects-http-requests-into-https-ones
+
+		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
+		34 |   name               = &quot;${local.name_prefix}-alb&quot;
+		35 |   internal           = false
+		36 |   load_balancer_type = &quot;application&quot;
+		37 |   security_groups    = [var.sg_alb_id]
+		38 |   subnets            = var.public_subnet_ids
+		39 | 
+		40 |   enable_deletion_protection = var.environment == &quot;prod&quot; ? true : false
+		41 | 
+		42 |   tags = {
+		43 |     Name = &quot;${local.name_prefix}-alb&quot;
+		44 |   }
+		45 | }
+</failure>
+		</testcase>
+>>>>>>> 72b02edb (feat: agregue el checkov results.xml)
 	</testsuite>
 </testsuites>
