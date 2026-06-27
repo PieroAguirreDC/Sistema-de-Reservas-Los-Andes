@@ -50,7 +50,7 @@ resource "aws_lb" "main" {
 resource "aws_lb_target_group" "api" {
   name        = "${local.name_prefix}-api-tg"
   port        = 3000
-  protocol    = "HTTP"
+  protocol    = "https"
   vpc_id      = var.vpc_id
   target_type = "ip"
 
@@ -61,7 +61,7 @@ resource "aws_lb_target_group" "api" {
     timeout             = 5
     interval            = 30
     path                = "/api/v1/health"
-    protocol            = "HTTP"
+    protocol            = "https"
     matcher             = "200"
   }
 
@@ -73,7 +73,7 @@ resource "aws_lb_target_group" "api" {
 resource "aws_lb_target_group" "web" {
   name        = "${local.name_prefix}-web-tg"
   port        = 3001
-  protocol    = "HTTP"
+  protocol    = "https"
   vpc_id      = var.vpc_id
   target_type = "ip"
 
@@ -84,7 +84,7 @@ resource "aws_lb_target_group" "web" {
     timeout             = 5
     interval            = 30
     path                = "/"
-    protocol            = "HTTP"
+    protocol            = "https"
     matcher             = "200"
   }
 
@@ -99,7 +99,7 @@ resource "aws_lb_target_group" "web" {
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
-  protocol          = "HTTP"
+  protocol          = "https"
 
   default_action {
     type = "redirect"
