@@ -147,3 +147,71 @@ resource "aws_lb_listener_rule" "api" {
     }
   }
 }
+
+resource "aws_wafv2_web_acl" "main" {
+  name  = "${local.name_prefix}-waf"
+  scope = "REGIONAL"
+  description = "WAF para el ALB público del sistema de reservas Hotel Los Andes"
+
+  default_action {
+    allow {}
+  }
+
+  # Regla 1: protección OWASP común (SQLi, XSS, LFI, path traversal)
+  rule {
+    name     = "AWSManagedRulesCommonRuleSet"
+    priority = 1
+
+    override_action { none {} }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.name_prefix}-waf-common"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Regla 2: inputs maliciosos conocidos (Log4Shell, SSRF, etc.)
+  rule {
+    name     = "AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 2
+
+    override_action { none {} }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "${local.name_prefix}-waf-badinputs"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${local.name_prefix}-waf"
+    sampled_requests_enabled   = true
+  }
+
+  tags = {
+    Name = "${local.name_prefix}-waf"
+  }
+}
+
+# Asocia el WAF al ALB
+resource "aws_wafv2_web_acl_association" "main" {
+  resource_arn = aws_lb.main.arn
+  web_acl_arn  = aws_wafv2_web_acl.main.arn
+}
