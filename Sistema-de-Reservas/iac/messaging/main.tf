@@ -27,6 +27,9 @@ locals {
   }, var.tags)
 }
 
+# Necesario para anclar las políticas SQS al account_id propio (evita wildcard)
+data "aws_caller_identity" "current" {}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # SNS TOPICS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -290,17 +293,22 @@ resource "aws_sqs_queue_policy" "reservas_pagos" {
 resource "aws_sqs_queue_policy" "auditoria" {
   queue_url = aws_sqs_queue.auditoria.id
 
+  # CKV_AWS_168: Usar ARNs explícitos de cada topic — sin wildcard en account_id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Sid       = "AllowAllSNSTopics"
+      Sid       = "AllowSNSTopicsAuditoria"
       Effect    = "Allow"
       Principal = { Service = "sns.amazonaws.com" }
       Action    = "sqs:SendMessage"
       Resource  = aws_sqs_queue.auditoria.arn
       Condition = {
-        ArnLike = {
-          "aws:SourceArn" = "arn:aws:sns:${var.aws_region}:*:${local.name_prefix}-topic-*"
+        ArnEquals = {
+          "aws:SourceArn" = [
+            aws_sns_topic.reservas.arn,
+            aws_sns_topic.pagos.arn,
+            aws_sns_topic.auditoria.arn
+          ]
         }
       }
     }]

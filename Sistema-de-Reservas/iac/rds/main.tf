@@ -73,30 +73,31 @@ resource "aws_rds_cluster" "main" {
   database_name      = var.aurora_database_name
   port               = var.aurora_port
 
-  # Credenciales desde Secrets Manager
-  master_username             = "admin_${var.project_name}"
+  master_username = "admin_${var.project_name}"
   master_password = var.db_master_password
 
-  # Red
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [var.sg_rds_id]
 
-  # Cifrado
   storage_encrypted = true
   kms_key_id        = var.kms_key_arn
 
-  # Backup automático nativo de Aurora
-  backup_retention_period = var.backup_retention_days
-  preferred_backup_window = var.backup_window
+  # CKV_AWS_162
+  iam_database_authentication_enabled = true
 
-  # Mantenimiento
+  # CKV_AWS_324 — CORRECCIÓN
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+
+  backup_retention_period      = var.backup_retention_days
+  preferred_backup_window      = var.backup_window
   preferred_maintenance_window = var.maintenance_window
 
-  # Parámetros
+  # CKV_AWS_313
+  copy_tags_to_snapshot = true
+
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.main.name
 
-  # Protección contra eliminación accidental
-  deletion_protection       = var.environment == "prod" ? true : false
+  deletion_protection       = true
   skip_final_snapshot       = var.environment == "prod" ? false : true
   final_snapshot_identifier = var.environment == "prod" ? "${local.name_prefix}-final-snapshot" : null
 
@@ -104,7 +105,6 @@ resource "aws_rds_cluster" "main" {
     Name = "${local.name_prefix}-aurora-cluster"
   }
 }
-
 # ─────────────────────────────────────────────────────────────────────────────
 # INSTANCIA PRIMARY — Escritura (us-east-1a)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -119,6 +119,13 @@ resource "aws_rds_cluster_instance" "primary" {
   db_subnet_group_name         = aws_db_subnet_group.main.name
   auto_minor_version_upgrade   = true
   performance_insights_enabled = true
+
+  # CKV_AWS_354: Performance Insights cifrado con KMS CMK
+  performance_insights_kms_key_id = var.kms_key_arn
+
+  # CKV_AWS_118: Enhanced Monitoring cada 60 segundos
+  monitoring_interval = 60
+  monitoring_role_arn = aws_iam_role.rds_enhanced_monitoring.arn
 
   tags = {
     Name = "${local.name_prefix}-aurora-primary"
@@ -141,10 +148,42 @@ resource "aws_rds_cluster_instance" "standby" {
   auto_minor_version_upgrade   = true
   performance_insights_enabled = true
 
+  # CKV_AWS_354: Performance Insights cifrado con KMS CMK
+  performance_insights_kms_key_id = var.kms_key_arn
+
+  # CKV_AWS_118: Enhanced Monitoring cada 60 segundos
+  monitoring_interval = 60
+  monitoring_role_arn = aws_iam_role.rds_enhanced_monitoring.arn
+
   tags = {
     Name = "${local.name_prefix}-aurora-standby"
     Role = "standby-readonly"
   }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IAM ROLE para Enhanced Monitoring (RDS publica métricas del OS a CloudWatch)
+# ─────────────────────────────────────────────────────────────────────────────
+resource "aws_iam_role" "rds_enhanced_monitoring" {
+  name = "${local.name_prefix}-rds-monitoring-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "monitoring.rds.amazonaws.com" }
+    }]
+  })
+
+  tags = {
+    Name = "${local.name_prefix}-rds-monitoring-role"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
+  role       = aws_iam_role.rds_enhanced_monitoring.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }
 
 # ─────────────────────────────────────────────────────────────────────────────

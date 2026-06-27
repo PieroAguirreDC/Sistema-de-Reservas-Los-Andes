@@ -3,20 +3,20 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 @Entity('pagos')
 export class Pago {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string = '';
 
   @Column()
-  reserva_id!: string;
+  reserva_id: string = '';
 
   @Column('decimal', { precision: 10, scale: 2 })
-  monto!: number;
+  monto: number = 0;
 
   @Column({ default: 'pendiente' })
-  estado!: string;
+  estado: string = 'pendiente';
 
   @Column({ nullable: true })
-  metodo_pago!: string;
+  metodo_pago: string = '';
 
   @CreateDateColumn()
-  created_at!: Date;
+  created_at: Date = new Date();
 }

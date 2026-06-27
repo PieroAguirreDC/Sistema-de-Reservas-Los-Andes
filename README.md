@@ -6,7 +6,7 @@ Curso: Infraestructura como Código
 
 - Piero Aguirre
 - Rodrigo Baldeon
-- Grezia
+- Grezia Merino
 
 ---
 
@@ -231,31 +231,6 @@ docker build -t web .
 docker-compose up
 ```
 
----
-
-## Variables de Entorno
-
-### API (`app/api/.env`)
-
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_NAME=reservas_db
-NODE_ENV=development
-PORT=3000
-```
-
-### Web (`app/web/.env.local`)
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
-NEXT_PUBLIC_USE_MOCK=true
-```
-
----
-
 ## Módulos API (NestJS)
 
 | Módulo | Ruta base | Descripción |
@@ -285,5 +260,6 @@ NEXT_PUBLIC_USE_MOCK=true
 - El campo `password` en `aws_secretsmanager_secret_version` debe cambiarse antes del `terraform apply` en producción.
 - El puerto 3000 en el SG de ECS corresponde al puerto de los microservicios NestJS.
 - `synchronize: true` en TypeORM solo debe usarse en desarrollo, nunca en producción.
-- Los archivos `dist/` y `node_modules/` no se suben al repositorio (ver `.gitignore`).
+- Los archivos `dist/`, `node_modules/` y `.env` no se suben al repositorio (ver `.gitignore`).
 - Los archivos `test.tfvars` y `.terraform/` no se suben al repositorio.
+

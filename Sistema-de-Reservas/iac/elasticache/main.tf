@@ -57,6 +57,9 @@ resource "aws_elasticache_replication_group" "main" {
   transit_encryption_enabled = true
   kms_key_id                 = var.kms_key_arn
 
+  # CKV_AWS_31: Token de autenticación obligatorio — inyectar vía TF_VAR_redis_auth_token
+  auth_token = var.redis_auth_token
+
   preferred_cache_cluster_azs = [
     var.availability_zones[0],
     var.availability_zones[1]
