@@ -48,3 +48,8 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+variable "kms_key_arn" {
+  description = "ARN de la KMS key para cifrar el SNS topic"
+  type        = string
+  default     = ""
+}

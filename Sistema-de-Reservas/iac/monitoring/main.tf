@@ -32,7 +32,8 @@ locals {
 # SNS — notificaciones por email
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_sns_topic" "alerts" {
-  name = "${local.name_prefix}-alerts"
+  name              = "${local.name_prefix}-alerts"
+  kms_master_key_id = var.kms_key_arn
 }
 
 resource "aws_sns_topic_subscription" "email" {
