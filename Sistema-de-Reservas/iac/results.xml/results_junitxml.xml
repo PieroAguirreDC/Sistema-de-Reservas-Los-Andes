@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
-<testsuites disabled="0" errors="0" failures="27" tests="228" time="0.0">
-	<testsuite disabled="0" errors="0" failures="27" name="terraform scan" skipped="0" tests="228" time="0">
+<testsuites disabled="0" errors="0" failures="17" tests="212" time="0.0">
+	<testsuite disabled="0" errors="0" failures="17" name="terraform scan" skipped="4" tests="212" time="0">
 		<properties>
 			<property name="directory" value="['/tf']"/>
 			<property name="add_check" value="False"/>
@@ -37,9 +37,6 @@
 			<property name="secrets_history_timeout" value="12h"/>
 			<property name="custom_tool_name" value="Checkov"/>
 		</properties>
-		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/alb/main.tf.aws.default" file="/alb/main.tf"/>
-		<testcase name="[NONE][CKV_AWS_328] Ensure that ALB is configured with defensive or strictest desync mitigation mode" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf"/>
-		<testcase name="[NONE][CKV_AWS_2] Ensure ALB protocol is HTTPS" classname="/alb/main.tf.aws_lb_listener.https" file="/alb/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_41] Ensure no hard coded AWS access key and secret key exists in provider" classname="/api-gateway/main.tf.aws.default" file="/api-gateway/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_76] Ensure API Gateway has Access Logging enabled" classname="/api-gateway/main.tf.aws_apigatewayv2_stage.default" file="/api-gateway/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_66] Ensure that CloudWatch Log Group specifies retention days" classname="/api-gateway/main.tf.aws_cloudwatch_log_group.api_gw" file="/api-gateway/main.tf"/>
@@ -213,116 +210,24 @@
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/rds/main.tf.aws_iam_role.aws_backup" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/rds/main.tf.aws_iam_role_policy_attachment.aws_backup" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_56] Ensure AWS Managed IAMFullAccess IAM policy is not used." classname="/vpc/main.tf.aws_iam_role.vpc_flow_logs" file="/vpc/main.tf"/>
-		<testcase name="[NONE][CKV2_AWS_76] Ensure AWS ALB attached WAFv2 WebACL is configured with AMR for Log4j Vulnerability" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf"/>
-		<testcase name="[NONE][CKV2_AWS_74] Ensure AWS Load Balancers use strong ciphers" classname="/alb/main.tf.aws_lb_listener.http" file="/alb/main.tf"/>
-		<testcase name="[NONE][CKV2_AWS_74] Ensure AWS Load Balancers use strong ciphers" classname="/alb/main.tf.aws_lb_listener.https" file="/alb/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_8] Ensure that RDS clusters has backup plan of AWS Backup" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_44] Ensure AWS route table with VPC peering does not contain routes overly permissive to all traffic" classname="/vpc/main.tf.aws_route_table.public" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_44] Ensure AWS route table with VPC peering does not contain routes overly permissive to all traffic" classname="/vpc/main.tf.aws_route_table.private_app" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_44] Ensure AWS route table with VPC peering does not contain routes overly permissive to all traffic" classname="/vpc/main.tf.aws_route_table.private_db" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_40] Ensure AWS IAM policy does not allow full IAM privileges" classname="/rds/main.tf.aws_iam_role_policy.rds_proxy" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_40] Ensure AWS IAM policy does not allow full IAM privileges" classname="/vpc/main.tf.aws_iam_role_policy.vpc_flow_logs" file="/vpc/main.tf"/>
-		<testcase name="[NONE][CKV2_AWS_64] Ensure KMS key Policy is defined" classname="/security/main.tf.aws_kms_key.main" file="/security/main.tf"/>
-		<testcase name="[NONE][CKV2_AWS_51] Ensure AWS API Gateway endpoints uses client certificate authentication" classname="/api-gateway/main.tf.aws_apigatewayv2_stage.default" file="/api-gateway/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_50] Ensure AWS ElastiCache Redis cluster with Multi-AZ Automatic Failover feature set to enabled" classname="/elasticache/main.tf.aws_elasticache_replication_group.main" file="/elasticache/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_51] Ensure AWS API Gateway endpoints uses client certificate authentication" classname="/api-gateway/main.tf.aws_apigatewayv2_stage.default" file="/api-gateway/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_64] Ensure KMS key Policy is defined" classname="/security/main.tf.aws_kms_key.main" file="/security/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_35] AWS NAT Gateways should be utilized for the default route" classname="/vpc/main.tf.aws_route_table.public" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_35] AWS NAT Gateways should be utilized for the default route" classname="/vpc/main.tf.aws_route_table.private_app" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_35] AWS NAT Gateways should be utilized for the default route" classname="/vpc/main.tf.aws_route_table.private_db" file="/vpc/main.tf"/>
-		<testcase name="[NONE][CKV_AWS_103] Ensure that load balancer is using at least TLS 1.2" classname="/alb/main.tf.aws_lb_listener.https" file="/alb/main.tf"/>
-		<testcase name="[NONE][CKV_AWS_103] Ensure that load balancer is using at least TLS 1.2" classname="/alb/main.tf.aws_lb_listener.http" file="/alb/main.tf"/>
-		<testcase name="[NONE][CKV2_AWS_27] Ensure Postgres RDS as aws_rds_cluster has Query Logging enabled" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_57] Ensure Secrets Manager secrets should have automatic rotation enabled" classname="/security/main.tf.aws_secretsmanager_secret.rds_credentials" file="/security/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_77] Ensure AWS API Gateway Rest API attached WAFv2 WebACL is configured with AMR for Log4j Vulnerability" classname="/api-gateway/main.tf.aws_apigatewayv2_api.main" file="/api-gateway/main.tf"/>
-		<testcase name="[NONE][CKV2_AWS_12] Ensure the default security group of every VPC restricts all traffic" classname="/vpc/main.tf.aws_vpc.main" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_11] Ensure VPC flow logging is enabled in all VPCs" classname="/vpc/main.tf.aws_vpc.main" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV2_AWS_5] Ensure that Security Groups are attached to another resource" classname="/vpc/main.tf.aws_security_group.vpc_endpoints" file="/vpc/main.tf"/>
-		<testcase name="[NONE][CKV_AWS_378] Ensure AWS Load Balancer doesn't use HTTP protocol" classname="/alb/main.tf.aws_lb_target_group.api" file="/alb/main.tf"/>
-		<testcase name="[NONE][CKV_AWS_378] Ensure AWS Load Balancer doesn't use HTTP protocol" classname="/alb/main.tf.aws_lb_target_group.web" file="/alb/main.tf"/>
-		<testcase name="[NONE][CKV_AWS_150] Ensure that Load Balancer has deletion protection enabled" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
-			<failure type="failure" message="Ensure that Load Balancer has deletion protection enabled">
-Resource: aws_lb.main
-File: /alb/main.tf: 33-45
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/bc-aws-150
-
-		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
-		34 |   name               = &quot;${local.name_prefix}-alb&quot;
-		35 |   internal           = false
-		36 |   load_balancer_type = &quot;application&quot;
-		37 |   security_groups    = [var.sg_alb_id]
-		38 |   subnets            = var.public_subnet_ids
-		39 | 
-		40 |   enable_deletion_protection = var.environment == &quot;prod&quot; ? true : false
-		41 | 
-		42 |   tags = {
-		43 |     Name = &quot;${local.name_prefix}-alb&quot;
-		44 |   }
-		45 | }
-</failure>
-		</testcase>
-		<testcase name="[NONE][CKV_AWS_131] Ensure that ALB drops HTTP headers" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
-			<failure type="failure" message="Ensure that ALB drops HTTP headers">
-Resource: aws_lb.main
-File: /alb/main.tf: 33-45
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-alb-drops-http-headers
-
-		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
-		34 |   name               = &quot;${local.name_prefix}-alb&quot;
-		35 |   internal           = false
-		36 |   load_balancer_type = &quot;application&quot;
-		37 |   security_groups    = [var.sg_alb_id]
-		38 |   subnets            = var.public_subnet_ids
-		39 | 
-		40 |   enable_deletion_protection = var.environment == &quot;prod&quot; ? true : false
-		41 | 
-		42 |   tags = {
-		43 |     Name = &quot;${local.name_prefix}-alb&quot;
-		44 |   }
-		45 | }
-</failure>
-		</testcase>
-		<testcase name="[NONE][CKV_AWS_91] Ensure the ELBv2 (Application/Network) has access logging enabled" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
-			<failure type="failure" message="Ensure the ELBv2 (Application/Network) has access logging enabled">
-Resource: aws_lb.main
-File: /alb/main.tf: 33-45
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/bc-aws-logging-22
-
-		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
-		34 |   name               = &quot;${local.name_prefix}-alb&quot;
-		35 |   internal           = false
-		36 |   load_balancer_type = &quot;application&quot;
-		37 |   security_groups    = [var.sg_alb_id]
-		38 |   subnets            = var.public_subnet_ids
-		39 | 
-		40 |   enable_deletion_protection = var.environment == &quot;prod&quot; ? true : false
-		41 | 
-		42 |   tags = {
-		43 |     Name = &quot;${local.name_prefix}-alb&quot;
-		44 |   }
-		45 | }
-</failure>
-		</testcase>
-		<testcase name="[NONE][CKV_AWS_2] Ensure ALB protocol is HTTPS" classname="/alb/main.tf.aws_lb_listener.http" file="/alb/main.tf">
-			<failure type="failure" message="Ensure ALB protocol is HTTPS">
-Resource: aws_lb_listener.http
-File: /alb/main.tf: 99-112
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/networking-29
-
-		99  | resource &quot;aws_lb_listener&quot; &quot;http&quot; {
-		100 |   load_balancer_arn = aws_lb.main.arn
-		101 |   port              = 80
-		102 |   protocol          = &quot;https&quot;
-		103 | 
-		104 |   default_action {
-		105 |     type = &quot;redirect&quot;
-		106 |     redirect {
-		107 |       port        = &quot;443&quot;
-		108 |       protocol    = &quot;HTTPS&quot;
-		109 |       status_code = &quot;HTTP_301&quot;
-		110 |     }
-		111 |   }
-		112 | }
-</failure>
-		</testcase>
+		<testcase name="[NONE][CKV2_AWS_27] Ensure Postgres RDS as aws_rds_cluster has Query Logging enabled" classname="/rds/main.tf.aws_rds_cluster.main" file="/rds/main.tf"/>
+		<testcase name="[NONE][CKV2_AWS_12] Ensure the default security group of every VPC restricts all traffic" classname="/vpc/main.tf.aws_vpc.main" file="/vpc/main.tf"/>
 		<testcase name="[NONE][CKV_AWS_309] Ensure API GatewayV2 routes specify an authorization type" classname="/api-gateway/main.tf.aws_apigatewayv2_route.default" file="/api-gateway/main.tf">
 			<failure type="failure" message="Ensure API GatewayV2 routes specify an authorization type">
 Resource: aws_apigatewayv2_route.default
@@ -568,10 +473,11 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		<testcase name="[NONE][CKV_AWS_260] Ensure no security groups allow ingress from 0.0.0.0:0 to port 80" classname="/security/main.tf.aws_security_group.alb" file="/security/main.tf">
 			<failure type="failure" message="Ensure no security groups allow ingress from 0.0.0.0:0 to port 80">
 Resource: aws_security_group.alb
-File: /security/main.tf: 127-159
+File: /security/main.tf: 126-159
 Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-aws-security-groups-do-not-allow-ingress-from-00000-to-port-80
 
-		127 | resource &quot;aws_security_group&quot; &quot;alb&quot; {
+		126 | resource &quot;aws_security_group&quot; &quot;alb&quot; {
+		127 |   #checkov:skip=CKV2_AWS_5:SG adjunto al ALB definido en el modulo alb
 		128 |   name        = &quot;${local.name_prefix}-sg-alb&quot;
 		129 |   description = &quot;SG del Application Load Balancer — permite HTTPS desde internet&quot;
 		130 |   vpc_id      = var.vpc_id
@@ -638,186 +544,17 @@ Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aw
 		273 | }
 </failure>
 		</testcase>
-		<testcase name="[NONE][CKV2_AWS_20] Ensure that ALB redirects HTTP requests into HTTPS ones" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
-			<failure type="failure" message="Ensure that ALB redirects HTTP requests into HTTPS ones">
-Resource: aws_lb.main
-File: /alb/main.tf: 33-45
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-alb-redirects-http-requests-into-https-ones
-
-		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
-		34 |   name               = &quot;${local.name_prefix}-alb&quot;
-		35 |   internal           = false
-		36 |   load_balancer_type = &quot;application&quot;
-		37 |   security_groups    = [var.sg_alb_id]
-		38 |   subnets            = var.public_subnet_ids
-		39 | 
-		40 |   enable_deletion_protection = var.environment == &quot;prod&quot; ? true : false
-		41 | 
-		42 |   tags = {
-		43 |     Name = &quot;${local.name_prefix}-alb&quot;
-		44 |   }
-		45 | }
-</failure>
-		</testcase>
-		<testcase name="[NONE][CKV2_AWS_28] Ensure public facing ALB are protected by WAF" classname="/alb/main.tf.aws_lb.main" file="/alb/main.tf">
-			<failure type="failure" message="Ensure public facing ALB are protected by WAF">
-Resource: aws_lb.main
-File: /alb/main.tf: 33-45
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-public-facing-alb-are-protected-by-waf
-
-		33 | resource &quot;aws_lb&quot; &quot;main&quot; {
-		34 |   name               = &quot;${local.name_prefix}-alb&quot;
-		35 |   internal           = false
-		36 |   load_balancer_type = &quot;application&quot;
-		37 |   security_groups    = [var.sg_alb_id]
-		38 |   subnets            = var.public_subnet_ids
-		39 | 
-		40 |   enable_deletion_protection = var.environment == &quot;prod&quot; ? true : false
-		41 | 
-		42 |   tags = {
-		43 |     Name = &quot;${local.name_prefix}-alb&quot;
-		44 |   }
-		45 | }
-</failure>
-		</testcase>
 		<testcase name="[NONE][CKV2_AWS_5] Ensure that Security Groups are attached to another resource" classname="/security/main.tf.aws_security_group.alb" file="/security/main.tf">
-			<failure type="failure" message="Ensure that Security Groups are attached to another resource">
-Resource: aws_security_group.alb
-File: /security/main.tf: 127-159
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-security-groups-are-attached-to-ec2-instances-or-elastic-network-interfaces-enis
-
-		127 | resource &quot;aws_security_group&quot; &quot;alb&quot; {
-		128 |   name        = &quot;${local.name_prefix}-sg-alb&quot;
-		129 |   description = &quot;SG del Application Load Balancer — permite HTTPS desde internet&quot;
-		130 |   vpc_id      = var.vpc_id
-		131 | 
-		132 |   ingress {
-		133 |     description = &quot;HTTPS desde internet&quot;
-		134 |     from_port   = 443
-		135 |     to_port     = 443
-		136 |     protocol    = &quot;tcp&quot;
-		137 |     cidr_blocks = [&quot;0.0.0.0/0&quot;]
-		138 |   }
-		139 | 
-		140 |   ingress {
-		141 |     description = &quot;HTTP desde internet (redirect a HTTPS)&quot;
-		142 |     from_port   = 80
-		143 |     to_port     = 80
-		144 |     protocol    = &quot;tcp&quot;
-		145 |     cidr_blocks = [&quot;0.0.0.0/0&quot;]
-		146 |   }
-		147 | 
-		148 |   egress {
-		149 |     description = &quot;Hacia microservicios en subredes de app&quot;
-		150 |     from_port   = 0
-		151 |     to_port     = 0
-		152 |     protocol    = &quot;-1&quot;
-		153 |     cidr_blocks = [var.vpc_cidr]
-		154 |   }
-		155 | 
-		156 |   tags = {
-		157 |     Name = &quot;${local.name_prefix}-sg-alb&quot;
-		158 |   }
-		159 | }
-</failure>
+			<skipped type="skipped" message="SG adjunto al ALB definido en el modulo alb"/>
 		</testcase>
 		<testcase name="[NONE][CKV2_AWS_5] Ensure that Security Groups are attached to another resource" classname="/security/main.tf.aws_security_group.ecs" file="/security/main.tf">
-			<failure type="failure" message="Ensure that Security Groups are attached to another resource">
-Resource: aws_security_group.ecs
-File: /security/main.tf: 164-188
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-security-groups-are-attached-to-ec2-instances-or-elastic-network-interfaces-enis
-
-		164 | resource &quot;aws_security_group&quot; &quot;ecs&quot; {
-		165 |   name        = &quot;${local.name_prefix}-sg-ecs&quot;
-		166 |   description = &quot;SG de los microservicios ECS — solo recibe tráfico desde el ALB&quot;
-		167 |   vpc_id      = var.vpc_id
-		168 | 
-		169 |   ingress {
-		170 |     description     = &quot;Tráfico desde el ALB&quot;
-		171 |     from_port       = 3000
-		172 |     to_port         = 3000
-		173 |     protocol        = &quot;tcp&quot;
-		174 |     security_groups = [aws_security_group.alb.id]
-		175 |   }
-		176 | 
-		177 |   egress {
-		178 |     description = &quot;Salida hacia VPC (RDS, ElastiCache, VPC Endpoints)&quot;
-		179 |     from_port   = 0
-		180 |     to_port     = 0
-		181 |     protocol    = &quot;-1&quot;
-		182 |     cidr_blocks = [var.vpc_cidr]
-		183 |   }
-		184 | 
-		185 |   tags = {
-		186 |     Name = &quot;${local.name_prefix}-sg-ecs&quot;
-		187 |   }
-		188 | }
-</failure>
+			<skipped type="skipped" message="SG adjunto a las ECS tasks definidas en el modulo ecs"/>
 		</testcase>
 		<testcase name="[NONE][CKV2_AWS_5] Ensure that Security Groups are attached to another resource" classname="/security/main.tf.aws_security_group.rds" file="/security/main.tf">
-			<failure type="failure" message="Ensure that Security Groups are attached to another resource">
-Resource: aws_security_group.rds
-File: /security/main.tf: 193-217
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-security-groups-are-attached-to-ec2-instances-or-elastic-network-interfaces-enis
-
-		193 | resource &quot;aws_security_group&quot; &quot;rds&quot; {
-		194 |   name        = &quot;${local.name_prefix}-sg-rds&quot;
-		195 |   description = &quot;SG de Aurora PostgreSQL — solo acepta conexiones desde ECS&quot;
-		196 |   vpc_id      = var.vpc_id
-		197 | 
-		198 |   ingress {
-		199 |     description     = &quot;PostgreSQL desde microservicios ECS&quot;
-		200 |     from_port       = 5432
-		201 |     to_port         = 5432
-		202 |     protocol        = &quot;tcp&quot;
-		203 |     security_groups = [aws_security_group.ecs.id]
-		204 |   }
-		205 | 
-		206 |   egress {
-		207 |     description = &quot;Respuesta hacia ECS&quot;
-		208 |     from_port   = 0
-		209 |     to_port     = 0
-		210 |     protocol    = &quot;-1&quot;
-		211 |     cidr_blocks = [var.vpc_cidr]
-		212 |   }
-		213 | 
-		214 |   tags = {
-		215 |     Name = &quot;${local.name_prefix}-sg-rds&quot;
-		216 |   }
-		217 | }
-</failure>
+			<skipped type="skipped" message="SG adjunto al cluster Aurora definido en el modulo rds"/>
 		</testcase>
 		<testcase name="[NONE][CKV2_AWS_5] Ensure that Security Groups are attached to another resource" classname="/security/main.tf.aws_security_group.elasticache" file="/security/main.tf">
-			<failure type="failure" message="Ensure that Security Groups are attached to another resource">
-Resource: aws_security_group.elasticache
-File: /security/main.tf: 222-246
-Guideline: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-security-groups-are-attached-to-ec2-instances-or-elastic-network-interfaces-enis
-
-		222 | resource &quot;aws_security_group&quot; &quot;elasticache&quot; {
-		223 |   name        = &quot;${local.name_prefix}-sg-elasticache&quot;
-		224 |   description = &quot;SG de ElastiCache Redis — solo acepta conexiones desde ECS&quot;
-		225 |   vpc_id      = var.vpc_id
-		226 | 
-		227 |   ingress {
-		228 |     description     = &quot;Redis desde microservicios ECS&quot;
-		229 |     from_port       = 6379
-		230 |     to_port         = 6379
-		231 |     protocol        = &quot;tcp&quot;
-		232 |     security_groups = [aws_security_group.ecs.id]
-		233 |   }
-		234 | 
-		235 |   egress {
-		236 |     description = &quot;Respuesta hacia ECS&quot;
-		237 |     from_port   = 0
-		238 |     to_port     = 0
-		239 |     protocol    = &quot;-1&quot;
-		240 |     cidr_blocks = [var.vpc_cidr]
-		241 |   }
-		242 | 
-		243 |   tags = {
-		244 |     Name = &quot;${local.name_prefix}-sg-elasticache&quot;
-		245 |   }
-		246 | }</failure>
+			<skipped type="skipped" message="SG adjunto al cluster Redis definido en el modulo elasticache"/>
 		</testcase>
 	</testsuite>
 </testsuites>

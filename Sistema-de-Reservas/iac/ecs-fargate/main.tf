@@ -70,14 +70,28 @@ resource "aws_ecs_task_definition" "api" {
   memory                   = var.api_memory
   execution_role_arn       = aws_iam_role.ecs_execution.arn
 
+  # Volumen temporal para PDFs y archivos temporales de NestJS
+  volume {
+    name = "tmp-api"
+  }
+
   container_definitions = jsonencode([{
-    name      = "api"
-    image     = var.api_image_uri
-    essential = true
+    name                   = "api"
+    image                  = var.api_image_uri
+    essential              = true
+    readonlyRootFilesystem = true        # fix CKV_AWS_336
+
     portMappings = [{
       containerPort = 3000
       protocol      = "tcp"
     }]
+
+    mountPoints = [{
+      sourceVolume  = "tmp-api"
+      containerPath = "/tmp"
+      readOnly      = false
+    }]
+
     logConfiguration = {
       logDriver = "awslogs"
       options = {
@@ -86,9 +100,10 @@ resource "aws_ecs_task_definition" "api" {
         "awslogs-stream-prefix" = "api"
       }
     }
+
     environment = [
       { name = "NODE_ENV", value = var.environment },
-      { name = "PORT", value = "3000" }
+      { name = "PORT",     value = "3000" }
     ]
   }])
 }
@@ -101,14 +116,28 @@ resource "aws_ecs_task_definition" "web" {
   memory                   = var.web_memory
   execution_role_arn       = aws_iam_role.ecs_execution.arn
 
+  # Volumen temporal para Next.js cache y builds
+  volume {
+    name = "tmp-web"
+  }
+
   container_definitions = jsonencode([{
-    name      = "web"
-    image     = var.web_image_uri
-    essential = true
+    name                   = "web"
+    image                  = var.web_image_uri
+    essential              = true
+    readonlyRootFilesystem = true        # fix CKV_AWS_336
+
     portMappings = [{
       containerPort = 3001
       protocol      = "tcp"
     }]
+
+    mountPoints = [{
+      sourceVolume  = "tmp-web"
+      containerPath = "/tmp"
+      readOnly      = false
+    }]
+
     logConfiguration = {
       logDriver = "awslogs"
       options = {
@@ -117,9 +146,10 @@ resource "aws_ecs_task_definition" "web" {
         "awslogs-stream-prefix" = "web"
       }
     }
+
     environment = [
       { name = "NODE_ENV", value = var.environment },
-      { name = "PORT", value = "3001" }
+      { name = "PORT",     value = "3001" }
     ]
   }])
 }
