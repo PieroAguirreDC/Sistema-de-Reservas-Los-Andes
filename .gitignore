@@ -24,3 +24,10 @@
 # Logs de crash
 **/crash.log
 **/crash.*.log
+
+echo "results.xml" >> .gitignore
+echo "results_after.xml" >> .gitignore
+echo "*.xml" >> .gitignore
+git add .gitignore
+git commit -m "chore(gitignore): exclude Checkov XML output files from version control"
+git push origin hotfix
