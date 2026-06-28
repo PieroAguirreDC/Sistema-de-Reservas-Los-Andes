@@ -111,7 +111,6 @@ resource "aws_secretsmanager_secret_version" "rds_credentials" {
 }
 
 # CKV2_AWS_57: Rotación automática de credenciales cada 30 días
-# Usa el Lambda gestionado por AWS para Aurora PostgreSQL
 resource "aws_secretsmanager_secret_rotation" "rds_credentials" {
   secret_id          = aws_secretsmanager_secret.rds_credentials.id
   rotate_immediately = false
@@ -125,6 +124,7 @@ resource "aws_secretsmanager_secret_rotation" "rds_credentials" {
 # ALB (recibe tráfico HTTPS desde internet)
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_security_group" "alb" {
+  #checkov:skip=CKV2_AWS_5:SG adjunto al ALB definido en el modulo alb
   name        = "${local.name_prefix}-sg-alb"
   description = "SG del Application Load Balancer — permite HTTPS desde internet"
   vpc_id      = var.vpc_id
@@ -162,6 +162,7 @@ resource "aws_security_group" "alb" {
 # SECURITY GROUP — ECS Fargate (microservicios)
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_security_group" "ecs" {
+  #checkov:skip=CKV2_AWS_5:SG adjunto a las ECS tasks definidas en el modulo ecs
   name        = "${local.name_prefix}-sg-ecs"
   description = "SG de los microservicios ECS — solo recibe tráfico desde el ALB"
   vpc_id      = var.vpc_id
@@ -191,6 +192,7 @@ resource "aws_security_group" "ecs" {
 # RDS Aurora
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_security_group" "rds" {
+  #checkov:skip=CKV2_AWS_5:SG adjunto al cluster Aurora definido en el modulo rds
   name        = "${local.name_prefix}-sg-rds"
   description = "SG de Aurora PostgreSQL — solo acepta conexiones desde ECS"
   vpc_id      = var.vpc_id
@@ -220,6 +222,7 @@ resource "aws_security_group" "rds" {
 # ElastiCache Redis
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_security_group" "elasticache" {
+  #checkov:skip=CKV2_AWS_5:SG adjunto al cluster Redis definido en el modulo elasticache
   name        = "${local.name_prefix}-sg-elasticache"
   description = "SG de ElastiCache Redis — solo acepta conexiones desde ECS"
   vpc_id      = var.vpc_id
