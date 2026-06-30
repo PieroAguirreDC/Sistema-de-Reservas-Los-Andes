@@ -1,4 +1,4 @@
-name: CI-Terraform
+name: CI-Terraform-Validate
 
 on:
   pull_request:
@@ -28,7 +28,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.6.0"
+          terraform_version: "1.10.5"
 
       - name: Check Terraform format
         # Revisa que todo tu código esté bien tabulado y ordenado
