@@ -8,14 +8,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.aws_region
-
-  default_tags {
-    tags = local.base_tags
-  }
-}
-
 locals {
   # Nombre corto reutilizable: reservas-dev
   name_prefix = "${var.project_name}-${var.environment}"

@@ -8,13 +8,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.aws_region
-  default_tags {
-    tags = local.base_tags
-  }
-}
-
 locals {
   name_prefix = "${var.project_name}-${var.environment}"
   base_tags = merge({

@@ -8,6 +8,7 @@
 # Permitir explícitamente archivos de ejemplo/plantillas
 !**/.env.example
 !**/.env.template
+
 # ─── Terraform ───────────────────────────────────────────────────────────────
 **/.terraform/
 **/.terraform.lock.hcl
@@ -25,9 +26,12 @@
 **/crash.log
 **/crash.*.log
 
-echo "results.xml" >> .gitignore
-echo "results_after.xml" >> .gitignore
-echo "*.xml" >> .gitignore
-git add .gitignore
-git commit -m "chore(gitignore): exclude Checkov XML output files from version control"
-git push origin hotfix
+# ─── SonarQube ───────────────────────────────────────────────────────────────
+**/.scannerwork/
+**/.sonar_lock
+**/sonar-project.properties
+
+# ─── Reportes y Seguridad (Checkov / Tests) ──────────────────────────────────
+**/results.xml
+**/results_after.xml
+**/*.xml

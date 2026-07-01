@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authAPI } from '@/app/lib/api';
+import { setUser } from '@/app/lib/storage';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
@@ -22,7 +23,7 @@ export default function LoginPage() {
 
     try {
       const res = await authAPI.login({ email, password });
-      localStorage.setItem('user', JSON.stringify(res));
+      setUser(res);
 
       if (res.rol === 'admin') {
         router.push('/admin/dashboard');

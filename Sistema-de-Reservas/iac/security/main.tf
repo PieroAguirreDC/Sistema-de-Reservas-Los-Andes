@@ -8,14 +8,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.aws_region
-
-  default_tags {
-    tags = local.base_tags
-  }
-}
-
 locals {
   name_prefix = "${var.project_name}-${var.environment}"
 
@@ -100,14 +92,10 @@ resource "aws_secretsmanager_secret_version" "rds_credentials" {
 
   secret_string = jsonencode({
     username = "admin_${var.project_name}"
-    password = "CAMBIAR_ANTES_DE_APPLY"
+    password = var.db_master_password
     engine   = "aurora-postgresql"
     port     = 5432
   })
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
 }
 
 # CKV2_AWS_57: Rotación automática de credenciales cada 30 días

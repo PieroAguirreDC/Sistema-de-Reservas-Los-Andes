@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { habitacionesAPI, reservasAPI } from '@/app/lib/api';
+import { getUser } from '@/app/lib/storage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
 import { Button } from '@/app/components/ui/button';
@@ -32,11 +33,12 @@ export default function InicioPage() {
   }, []);
 
   const handleReservar = async () => {
-    if (!selected || !fechaInicio || !fechaFin) return;
+    const user = getUser();
+    if (!user || !selected) return;
+
     setLoading(true);
     setMensaje('');
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
       await reservasAPI.create({
         usuario_id: user.id,
         habitacion_id: selected.id,
