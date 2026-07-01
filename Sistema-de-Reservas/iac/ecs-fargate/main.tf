@@ -45,12 +45,14 @@ resource "aws_iam_role_policy_attachment" "ecs_execution" {
 
 resource "aws_cloudwatch_log_group" "api" {
   name              = "/ecs/${local.name_prefix}/api"
-  retention_in_days = 7
+  retention_in_days = 365              # fix CKV_AWS_338
+  kms_key_id        = var.kms_key_arn  # fix CKV_AWS_158
 }
 
 resource "aws_cloudwatch_log_group" "web" {
   name              = "/ecs/${local.name_prefix}/web"
-  retention_in_days = 7
+  retention_in_days = 365              # fix CKV_AWS_338
+  kms_key_id        = var.kms_key_arn  # fix CKV_AWS_158
 }
 
 resource "aws_ecs_cluster" "main" {

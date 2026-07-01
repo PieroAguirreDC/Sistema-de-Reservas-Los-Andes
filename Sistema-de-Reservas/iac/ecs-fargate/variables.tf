@@ -76,3 +76,8 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+
+variable "kms_key_arn" {
+  description = "ARN de la KMS CMK para cifrar los log groups de ECS"
+  type        = string
+}
