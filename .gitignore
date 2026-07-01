@@ -1,0 +1,37 @@
+**/node_modules/
+**/.next/
+**/dist/
+
+# ─── Secrets y Variables de Entorno ──────────────────────────────────────────
+# Ignorar todos los archivos de entorno
+**/.env*
+# Permitir explícitamente archivos de ejemplo/plantillas
+!**/.env.example
+!**/.env.template
+
+# ─── Terraform ───────────────────────────────────────────────────────────────
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/tfplan
+**/*.tfplan
+# NUNCA commitear archivos con secrets — solo terraform.tfvars (sin secrets) es seguro
+# Archivos de override locales
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
+# Logs de crash
+**/crash.log
+**/crash.*.log
+
+# ─── SonarQube ───────────────────────────────────────────────────────────────
+**/.scannerwork/
+**/.sonar_lock
+**/sonar-project.properties
+
+# ─── Reportes y Seguridad (Checkov / Tests) ──────────────────────────────────
+**/results.xml
+**/results_after.xml
+**/*.xml

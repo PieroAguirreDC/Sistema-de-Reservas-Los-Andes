@@ -1,0 +1,49 @@
+name: CI-Terraform-Validate
+
+on:
+  pull_request:
+    branches:
+      - main
+      - developer
+    paths:
+      - "Sistema-de-Reservas/iac/**"
+      - ".github/workflows/terraform.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  terraform-validate:
+    name: Terraform Dynamic Validation
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+
+      - name: Check Terraform format
+        # Revisa que todo tu código esté bien tabulado y ordenado
+        run: terraform fmt -check -recursive Sistema-de-Reservas/iac
+
+      - name: Terraform Init & Validate (Offline Mode)
+        # Bucle avanzado: Entra a cada carpeta tuya (vpc, rds, alb, etc.) y la valida
+        # El parámetro -backend=false BLOQUEA cualquier conexión a AWS
+        run: |
+          for dir in $(find Sistema-de-Reservas/iac -type d -not -path "*/\.*"); do
+            if ls $dir/*.tf &> /dev/null; then
+              echo "========================================"
+              echo "🔍 Validando módulo arquitectónico en: $dir"
+              echo "========================================"
+              terraform -chdir="$dir" init -backend=false -input=false
+              terraform -chdir="$dir" validate
+            fi
+          done

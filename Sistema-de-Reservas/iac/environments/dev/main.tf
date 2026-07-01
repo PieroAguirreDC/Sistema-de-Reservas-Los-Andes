@@ -1,0 +1,230 @@
+# ═════════════════════════════════════════════════════════════════════════════
+# ENVIRONMENTS / DEV — Punto de entrada real de Terraform
+# Aquí se "llama" a todos los módulos con valores concretos para el entorno dev.
+# Los módulos hijos (../../vpc, ../../security, etc.) NO tienen su propio
+# provider — lo heredan de aquí.
+# ═════════════════════════════════════════════════════════════════════════════
+
+terraform {
+  required_version = ">= 1.6.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
+  }
+
+  # backend "s3" {
+  #   bucket         = "reservas-terraform-state"
+  #   key            = "dev/terraform.tfstate"
+  #   region         = "us-east-1"
+  #   dynamodb_table = "reservas-terraform-locks"
+  #   encrypt        = true
+  # }
+}
+
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      Environment = var.environment
+      ManagedBy   = "terraform"
+    }
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECRETOS GENERADOS — se crean una sola vez aquí y se reparten a los módulos
+# que los necesitan, para que NUNCA queden desincronizados entre sí.
+# ─────────────────────────────────────────────────────────────────────────────
+resource "random_password" "db_master_password" {
+  length  = 24
+  special = false # Aurora rechaza algunos caracteres especiales en el password
+}
+
+resource "random_password" "redis_auth_token" {
+  length  = 32
+  special = false # ElastiCache auth token no admite todos los símbolos
+}
+
+# ═════════════════════════════════════════════════════════════════════════════
+# FASE 1 — INFRAESTRUCTURA BASE
+# ═════════════════════════════════════════════════════════════════════════════
+
+# ─── VPC ────────────────────────────────────────────────────────────────────
+module "vpc" {
+  source = "../../vpc"
+
+  aws_region            = var.aws_region
+  project_name          = var.project_name
+  environment           = var.environment
+  vpc_cidr              = var.vpc_cidr
+  enable_vpc_endpoints  = true
+  tags                  = var.tags
+}
+
+# ─── SECURITY (SGs, KMS, Secrets Manager) ────────────────────────────────────
+module "security" {
+  source = "../../security"
+
+  aws_region          = var.aws_region
+  project_name        = var.project_name
+  environment         = var.environment
+  vpc_id              = module.vpc.vpc_id
+  vpc_cidr            = module.vpc.vpc_cidr
+  private_app_cidrs   = module.vpc.private_app_cidrs
+  kms_deletion_window = 7
+  db_master_password  = random_password.db_master_password.result
+  tags                = var.tags
+}
+
+# ─── RDS (Aurora PostgreSQL + Proxy + Backup) ────────────────────────────────
+module "rds" {
+  source = "../../rds"
+
+  aws_region             = var.aws_region
+  project_name           = var.project_name
+  environment            = var.environment
+  vpc_id                 = module.vpc.vpc_id
+  private_db_subnet_ids  = module.vpc.private_db_subnet_ids
+  availability_zones     = module.vpc.availability_zones
+  kms_key_arn            = module.security.kms_key_arn
+  sg_rds_id              = module.security.sg_rds_id
+  secret_rds_arn         = module.security.secret_rds_arn
+  db_master_password     = random_password.db_master_password.result
+
+  aurora_instance_class  = "db.t3.medium" # dev: barato. prod usará db.r6g.large
+  aurora_engine_version  = "15.4"
+  aurora_database_name   = "reservas_db"
+  backup_retention_days  = 7
+  aws_backup_retention_days = 30
+
+  tags = var.tags
+}
+
+# ─── ELASTICACHE (Redis) ──────────────────────────────────────────────────────
+module "elasticache" {
+  source = "../../elasticache"
+
+  aws_region             = var.aws_region
+  project_name           = var.project_name
+  environment             = var.environment
+  vpc_id                 = module.vpc.vpc_id
+  private_db_subnet_ids  = module.vpc.private_db_subnet_ids
+  availability_zones     = module.vpc.availability_zones
+  sg_elasticache_id      = module.security.sg_elasticache_id
+  kms_key_arn            = module.security.kms_key_arn
+  node_type              = "cache.t3.micro" # dev: barato. prod usará cache.r6g.large
+  redis_engine_version   = "7.0"
+  redis_auth_token       = random_password.redis_auth_token.result
+
+  tags = var.tags
+}
+
+# ─── MESSAGING (SNS/SQS) ──────────────────────────────────────────────────────
+module "messaging" {
+  source = "../../messaging"
+
+  aws_region   = var.aws_region
+  project_name = var.project_name
+  environment  = var.environment
+  kms_key_arn  = module.security.kms_key_arn
+  tags         = var.tags
+}
+
+# ═════════════════════════════════════════════════════════════════════════════
+# FASE 2 (apoyo) — ECR
+# Repos vacíos: aquí se hace `docker push` luego de probar localmente.
+# Crear esto es barato y no requiere imágenes todavía.
+# ═════════════════════════════════════════════════════════════════════════════
+module "ecr" {
+  source = "../../ecr"
+
+  aws_region   = var.aws_region
+  project_name = var.project_name
+  environment  = var.environment
+  tags         = var.tags
+}
+
+# ═════════════════════════════════════════════════════════════════════════════
+# FASE 3 — CÓMPUTO Y EXPOSICIÓN
+# ⚠️ No apliques este bloque hasta tener imágenes reales en ECR
+# (api_image_uri / web_image_uri apuntan a ":latest", que no existirá
+# hasta que hagas el primer `docker push`).
+# ═════════════════════════════════════════════════════════════════════════════
+
+# ─── ALB ──────────────────────────────────────────────────────────────────────
+module "alb" {
+  source = "../../alb"
+
+  aws_region        = var.aws_region
+  project_name      = var.project_name
+  environment       = var.environment
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  sg_alb_id         = module.security.sg_alb_id
+  certificate_arn   = var.certificate_arn
+  tags              = var.tags
+}
+
+# ─── ECS FARGATE ───────────────────────────────────────────────────────────────
+module "ecs_fargate" {
+  source = "../../ecs-fargate"
+
+  aws_region            = var.aws_region
+  project_name          = var.project_name
+  environment           = var.environment
+  vpc_id                = module.vpc.vpc_id
+  private_subnet_ids    = module.vpc.private_app_subnet_ids
+  sg_ecs_id             = module.security.sg_ecs_id
+  api_target_group_arn  = module.alb.api_target_group_arn
+  web_target_group_arn  = module.alb.web_target_group_arn
+  kms_key_arn           = module.security.kms_key_arn
+
+  # Apuntan al repo ECR + tag "latest". Debes hacer `docker push` antes de
+  # aplicar este módulo, o ECS no podrá arrancar las tasks.
+  api_image_uri = "${module.ecr.api_repository_url}:latest"
+  web_image_uri = "${module.ecr.web_repository_url}:latest"
+
+  api_cpu        = 256
+  api_memory     = 512
+  web_cpu        = 256
+  web_memory     = 512
+  desired_count  = 1
+
+  tags = var.tags
+}
+
+# ─── API GATEWAY ────────────────────────────────────────────────────────────────
+module "api_gateway" {
+  source = "../../api-gateway"
+
+  aws_region   = var.aws_region
+  project_name = var.project_name
+  environment  = var.environment
+  alb_dns_name = module.alb.alb_dns_name
+  tags         = var.tags
+}
+
+# ─── MONITORING (CloudWatch) ────────────────────────────────────────────────────
+module "monitoring" {
+  source = "../../monitoring"
+
+  aws_region           = var.aws_region
+  project_name         = var.project_name
+  environment          = var.environment
+  cluster_name         = module.ecs_fargate.cluster_name
+  api_service_name     = module.ecs_fargate.api_service_name
+  web_service_name     = module.ecs_fargate.web_service_name
+  alb_arn              = module.alb.alb_arn
+  api_target_group_arn = module.alb.api_target_group_arn
+  kms_key_arn          = module.security.kms_key_arn
+  alarm_email          = var.alarm_email
+  tags                 = var.tags
+}
