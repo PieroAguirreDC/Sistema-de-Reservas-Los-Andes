@@ -8,13 +8,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.aws_region
-  default_tags {
-    tags = local.base_tags
-  }
-}
-
 locals {
   name_prefix = "${var.project_name}-${var.environment}"
   base_tags = merge({
@@ -143,6 +136,34 @@ resource "aws_ecs_service" "api" {
     target_group_arn = var.api_target_group_arn
     container_name   = "api"
     container_port   = 3000
+  }
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition, desired_count]
+  }
+}
+resource "aws_ecs_service" "web" {
+  name            = "${local.name_prefix}-web-svc"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.web.arn
+  desired_count   = var.desired_count
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = var.private_subnet_ids
+    security_groups  = [var.sg_ecs_id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = var.web_target_group_arn
+    container_name   = "web"
+    container_port   = 3001
   }
 
   deployment_circuit_breaker {
