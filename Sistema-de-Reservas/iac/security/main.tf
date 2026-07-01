@@ -163,6 +163,14 @@ resource "aws_security_group" "ecs" {
     security_groups = [aws_security_group.alb.id]
   }
 
+    ingress {
+    description     = "Tráfico desde el ALB hacia el frontend web"
+    from_port       = 3001
+    to_port         = 3001
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
   egress {
     description = "Salida hacia VPC (RDS, ElastiCache, VPC Endpoints)"
     from_port   = 0
