@@ -112,6 +112,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "uploads_public" {
   rule {
     id     = "abort-incomplete-multipart-uploads"
     status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 1
     }
@@ -171,6 +176,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "uploads_private" {
   rule {
     id     = "abort-incomplete-multipart-uploads"
     status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 1
     }

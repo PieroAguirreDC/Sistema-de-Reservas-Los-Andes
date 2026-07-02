@@ -28,7 +28,8 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
+  profile = var.aws_profile != "" ? var.aws_profile : null
 
   default_tags {
     tags = {
@@ -138,6 +139,16 @@ module "messaging" {
   tags         = var.tags
 }
 
+module "s3" {
+  source = "../../s3"
+
+  project_name            = var.project_name
+  environment             = var.environment
+  kms_key_arn             = module.security.kms_key_arn
+  allowed_upload_origins  = ["http://localhost:3001"]
+  tags                    = var.tags
+}
+
 # ═════════════════════════════════════════════════════════════════════════════
 # FASE 2 (apoyo) — ECR
 # Repos vacíos: aquí se hace `docker push` luego de probar localmente.
@@ -187,8 +198,6 @@ module "ecs_fargate" {
   web_target_group_arn  = module.alb.web_target_group_arn
   kms_key_arn           = module.security.kms_key_arn
 
-  # Apuntan al repo ECR + tag "latest". Debes hacer `docker push` antes de
-  # aplicar este módulo, o ECS no podrá arrancar las tasks.
   api_image_uri = "${module.ecr.api_repository_url}:latest"
   web_image_uri = "${module.ecr.web_repository_url}:latest"
 
@@ -197,6 +206,31 @@ module "ecs_fargate" {
   web_cpu        = 256
   web_memory     = 512
   desired_count  = 1
+
+  # ── Nuevo: base de datos ──
+  rds_proxy_endpoint    = module.rds.rds_proxy_endpoint
+  aurora_database_name  = module.rds.aurora_database_name
+  aurora_port           = module.rds.aurora_port
+  secret_rds_arn        = module.security.secret_rds_arn
+
+  # ── Nuevo: cache ──
+  redis_primary_endpoint = module.elasticache.redis_primary_endpoint
+  redis_port              = module.elasticache.redis_port
+
+  # ── Nuevo: S3 ──
+  s3_bucket_public       = module.s3.uploads_public_bucket_name
+  s3_bucket_private      = module.s3.uploads_private_bucket_name
+  s3_uploads_policy_arn  = module.s3.backend_uploads_policy_arn
+
+  # ── Nuevo: mensajería ──
+  sns_topic_reservas_arn             = module.messaging.sns_topic_reservas_arn
+  sns_topic_pagos_arn                = module.messaging.sns_topic_pagos_arn
+  sqs_reservas_notificaciones_arn     = module.messaging.sqs_reservas_notificaciones_arn
+  sqs_pagos_notificaciones_arn        = module.messaging.sqs_pagos_notificaciones_arn
+  sqs_reservas_pagos_arn              = module.messaging.sqs_reservas_pagos_arn
+  sqs_reservas_notificaciones_url     = module.messaging.sqs_reservas_notificaciones_url
+  sqs_pagos_notificaciones_url        = module.messaging.sqs_pagos_notificaciones_url
+  sqs_reservas_pagos_url              = module.messaging.sqs_reservas_pagos_url
 
   tags = var.tags
 }

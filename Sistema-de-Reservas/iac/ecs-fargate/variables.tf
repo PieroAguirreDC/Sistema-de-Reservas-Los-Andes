@@ -81,3 +81,72 @@ variable "kms_key_arn" {
   description = "ARN de la KMS CMK para cifrar los log groups de ECS"
   type        = string
 }
+variable "rds_proxy_endpoint" {
+  type = string
+}
+
+variable "aurora_database_name" {
+  type = string
+}
+
+variable "aurora_port" {
+  type    = number
+  default = 5432
+}
+
+variable "secret_rds_arn" {
+  type = string
+}
+
+variable "redis_primary_endpoint" {
+  type = string
+}
+
+variable "redis_port" {
+  type    = number
+  default = 6379
+}
+
+variable "s3_bucket_public" {
+  type = string
+}
+
+variable "s3_bucket_private" {
+  type = string
+}
+
+variable "s3_uploads_policy_arn" {
+  type = string
+}
+
+variable "sns_topic_reservas_arn" {
+  type = string
+}
+
+variable "sns_topic_pagos_arn" {
+  type = string
+}
+
+variable "sqs_reservas_notificaciones_arn" {
+  type = string
+}
+
+variable "sqs_pagos_notificaciones_arn" {
+  type = string
+}
+
+variable "sqs_reservas_pagos_arn" {
+  type = string
+}
+
+variable "sqs_reservas_notificaciones_url" {
+  type = string
+}
+
+variable "sqs_pagos_notificaciones_url" {
+  type = string
+}
+
+variable "sqs_reservas_pagos_url" {
+  type = string
+}

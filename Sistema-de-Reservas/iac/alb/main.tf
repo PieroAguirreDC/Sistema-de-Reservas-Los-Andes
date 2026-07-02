@@ -143,7 +143,7 @@ resource "aws_lb_listener_rule" "api" {
 resource "aws_wafv2_web_acl" "main" {
   name  = "${local.name_prefix}-waf"
   scope = "REGIONAL"
-  description = "WAF para el ALB público del sistema de reservas Hotel Los Andes"
+  description = "WAF para el ALB publico"
 
   default_action {
     allow {}
@@ -154,7 +154,9 @@ resource "aws_wafv2_web_acl" "main" {
     name     = "AWSManagedRulesCommonRuleSet"
     priority = 1
 
-    override_action { none {} }
+    override_action {
+      none {}
+    }
 
     statement {
       managed_rule_group_statement {
@@ -175,7 +177,9 @@ resource "aws_wafv2_web_acl" "main" {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
     priority = 2
 
-    override_action { none {} }
+    override_action {
+      none {}
+    }
 
     statement {
       managed_rule_group_statement {

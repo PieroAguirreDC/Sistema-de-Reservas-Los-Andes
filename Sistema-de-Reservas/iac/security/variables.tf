@@ -49,6 +49,11 @@ variable "kms_deletion_window" {
   }
 }
 
+variable "db_master_password" {
+  description = "Contraseña maestra para la base de datos Aurora que se almacena en Secrets Manager"
+  type        = string
+}
+
 variable "tags" {
   description = "Tags adicionales a fusionar con los tags base"
   type        = map(string)

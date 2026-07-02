@@ -57,6 +57,72 @@ resource "aws_ecs_cluster" "main" {
   }
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# TASK ROLE — permisos en tiempo de ejecución del backend (S3, SNS/SQS)
+# ─────────────────────────────────────────────────────────────────────────────
+resource "aws_iam_role" "ecs_task" {
+  name = "${local.name_prefix}-ecs-task-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_s3_uploads" {
+  role       = aws_iam_role.ecs_task.name
+  policy_arn = var.s3_uploads_policy_arn
+}
+
+data "aws_iam_policy_document" "ecs_task_messaging" {
+  statement {
+    sid     = "PublishReservasYPagos"
+    effect  = "Allow"
+    actions = ["sns:Publish"]
+    resources = [
+      var.sns_topic_reservas_arn,
+      var.sns_topic_pagos_arn,
+    ]
+  }
+
+  statement {
+    sid     = "ConsumirColasNotificaciones"
+    effect  = "Allow"
+    actions = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
+    resources = [
+      var.sqs_reservas_notificaciones_arn,
+      var.sqs_pagos_notificaciones_arn,
+      var.sqs_reservas_pagos_arn,
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "ecs_task_messaging" {
+  name   = "${local.name_prefix}-ecs-task-messaging"
+  role   = aws_iam_role.ecs_task.id
+  policy = data.aws_iam_policy_document.ecs_task_messaging.json
+}
+
+# Permiso para que el EXECUTION role pueda leer el secret de RDS al arrancar
+# el contenedor (inyección vía "secrets" en el container_definitions)
+data "aws_iam_policy_document" "ecs_execution_secrets" {
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [var.secret_rds_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "ecs_execution_secrets" {
+  name   = "${local.name_prefix}-ecs-execution-secrets"
+  role   = aws_iam_role.ecs_execution.name
+  policy = data.aws_iam_policy_document.ecs_execution_secrets.json
+}
+
 resource "aws_ecs_task_definition" "api" {
   family                   = "${local.name_prefix}-api"
   network_mode             = "awsvpc"
@@ -64,6 +130,7 @@ resource "aws_ecs_task_definition" "api" {
   cpu                      = var.api_cpu
   memory                   = var.api_memory
   execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
 
   container_definitions = jsonencode([{
     name      = "api"
@@ -82,8 +149,26 @@ resource "aws_ecs_task_definition" "api" {
       }
     }
     environment = [
-      { name = "NODE_ENV", value = var.environment },
-      { name = "PORT", value = "3000" }
+      { name = "NODE_ENV",   value = var.environment },
+      { name = "PORT",       value = "3000" },
+      { name = "DB_HOST",    value = var.rds_proxy_endpoint },
+      { name = "DB_PORT",    value = tostring(var.aurora_port) },
+      { name = "DB_NAME",    value = var.aurora_database_name },
+      { name = "DB_SSL",     value = "true" },
+      { name = "REDIS_HOST", value = var.redis_primary_endpoint },
+      { name = "REDIS_PORT", value = tostring(var.redis_port) },
+      { name = "AWS_REGION", value = var.aws_region },
+      { name = "S3_BUCKET_PUBLIC",  value = var.s3_bucket_public },
+      { name = "S3_BUCKET_PRIVATE", value = var.s3_bucket_private },
+      { name = "SNS_TOPIC_RESERVAS_ARN", value = var.sns_topic_reservas_arn },
+      { name = "SNS_TOPIC_PAGOS_ARN",    value = var.sns_topic_pagos_arn },
+      { name = "SQS_RESERVAS_NOTIFICACIONES_URL", value = var.sqs_reservas_notificaciones_url },
+      { name = "SQS_PAGOS_NOTIFICACIONES_URL",    value = var.sqs_pagos_notificaciones_url },
+      { name = "SQS_RESERVAS_PAGOS_URL",          value = var.sqs_reservas_pagos_url },
+    ]
+    secrets = [
+      { name = "DB_USERNAME", valueFrom = "${var.secret_rds_arn}:username::" },
+      { name = "DB_PASSWORD", valueFrom = "${var.secret_rds_arn}:password::" },
     ]
   }])
 }

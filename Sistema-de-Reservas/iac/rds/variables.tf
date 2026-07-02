@@ -63,7 +63,7 @@ variable "aurora_instance_class" {
 variable "aurora_engine_version" {
   description = "Versión del motor Aurora PostgreSQL"
   type        = string
-  default     = "15.4"
+  default     = "15.13"
 }
 
 variable "aurora_database_name" {

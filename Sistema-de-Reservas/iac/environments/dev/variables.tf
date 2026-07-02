@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_profile" {
+  description = "Perfil AWS CLI para usar con Terraform. Si está vacío, se usa el perfil por defecto o las variables de entorno."
+  type        = string
+  default     = ""
+}
+
 variable "project_name" {
   description = "Prefijo usado en el nombre de todos los recursos"
   type        = string

@@ -54,9 +54,13 @@ resource "aws_kms_key" "main" {
         }
         Action = [
           "kms:Decrypt",
+          "kms:Encrypt",
           "kms:GenerateDataKey",
+          "kms:ReEncryptFrom",
+          "kms:ReEncryptTo",
           "kms:CreateGrant",
-          "kms:DescribeKey"
+          "kms:DescribeKey",
+          "kms:ListGrants"
         ]
         Resource = "*"
       }
@@ -98,23 +102,13 @@ resource "aws_secretsmanager_secret_version" "rds_credentials" {
   })
 }
 
-# CKV2_AWS_57: Rotación automática de credenciales cada 30 días
-resource "aws_secretsmanager_secret_rotation" "rds_credentials" {
-  secret_id          = aws_secretsmanager_secret.rds_credentials.id
-  rotate_immediately = false
-
-  rotation_rules {
-    automatically_after_days = 30
-  }
-}
-
 # ─────────────────────────────────────────────────────────────────────────────
 # ALB (recibe tráfico HTTPS desde internet)
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_security_group" "alb" {
   #checkov:skip=CKV2_AWS_5:SG adjunto al ALB definido en el modulo alb
   name        = "${local.name_prefix}-sg-alb"
-  description = "SG del Application Load Balancer — permite HTTPS desde internet"
+  description = "SG del Application Load Balancer - permite HTTPS desde internet"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -152,11 +146,11 @@ resource "aws_security_group" "alb" {
 resource "aws_security_group" "ecs" {
   #checkov:skip=CKV2_AWS_5:SG adjunto a las ECS tasks definidas en el modulo ecs
   name        = "${local.name_prefix}-sg-ecs"
-  description = "SG de los microservicios ECS — solo recibe tráfico desde el ALB"
+  description = "SG de los microservicios ECS - solo recibe trafico desde el ALB"
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "Tráfico desde el ALB"
+    description     = "Trafico desde el ALB"
     from_port       = 3000
     to_port         = 3000
     protocol        = "tcp"
@@ -164,7 +158,7 @@ resource "aws_security_group" "ecs" {
   }
 
     ingress {
-    description     = "Tráfico desde el ALB hacia el frontend web"
+    description     = "Trafico desde el ALB hacia el frontend web"
     from_port       = 3001
     to_port         = 3001
     protocol        = "tcp"
@@ -190,7 +184,7 @@ resource "aws_security_group" "ecs" {
 resource "aws_security_group" "rds" {
   #checkov:skip=CKV2_AWS_5:SG adjunto al cluster Aurora definido en el modulo rds
   name        = "${local.name_prefix}-sg-rds"
-  description = "SG de Aurora PostgreSQL — solo acepta conexiones desde ECS"
+  description = "SG de Aurora PostgreSQL - solo acepta conexiones desde ECS"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -220,7 +214,7 @@ resource "aws_security_group" "rds" {
 resource "aws_security_group" "elasticache" {
   #checkov:skip=CKV2_AWS_5:SG adjunto al cluster Redis definido en el modulo elasticache
   name        = "${local.name_prefix}-sg-elasticache"
-  description = "SG de ElastiCache Redis — solo acepta conexiones desde ECS"
+  description = "SG de ElastiCache Redis - solo acepta conexiones desde ECS"
   vpc_id      = var.vpc_id
 
   ingress {

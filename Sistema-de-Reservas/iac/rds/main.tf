@@ -35,17 +35,10 @@ resource "aws_db_subnet_group" "main" {
 # ─────────────────────────────────────────────────────────────────────────────
 # PARAMETER GROUP — Configuración del motor PostgreSQL
 # ─────────────────────────────────────────────────────────────────────────────
-resource "aws_cloudwatch_log_group" "api" {
-  name              = "/ecs/${local.name_prefix}/api"
-  retention_in_days = 365              # fix CKV_AWS_338
-  kms_key_id        = var.kms_key_arn  # fix CKV_AWS_158
-}
-
-resource "aws_cloudwatch_log_group" "web" {
-  name              = "/ecs/${local.name_prefix}/web"
-  retention_in_days = 365              # fix CKV_AWS_338
-  kms_key_id        = var.kms_key_arn  # fix CKV_AWS_158
-}
+resource "aws_rds_cluster_parameter_group" "main" {
+  name        = "${local.name_prefix}-aurora-params"
+  family      = "aurora-postgresql15"
+  description = "Parameter group para Aurora PostgreSQL ${local.name_prefix}"
 
   parameter {
     name  = "log_min_duration_statement"
