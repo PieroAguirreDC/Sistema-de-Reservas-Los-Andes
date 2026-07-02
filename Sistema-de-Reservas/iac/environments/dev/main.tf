@@ -62,12 +62,12 @@ resource "random_password" "redis_auth_token" {
 module "vpc" {
   source = "../../vpc"
 
-  aws_region            = var.aws_region
-  project_name          = var.project_name
-  environment           = var.environment
-  vpc_cidr              = var.vpc_cidr
-  enable_vpc_endpoints  = true
-  tags                  = var.tags
+  aws_region           = var.aws_region
+  project_name         = var.project_name
+  environment          = var.environment
+  vpc_cidr             = var.vpc_cidr
+  enable_vpc_endpoints = true
+  tags                 = var.tags
 }
 
 # ─── SECURITY (SGs, KMS, Secrets Manager) ────────────────────────────────────
@@ -89,21 +89,21 @@ module "security" {
 module "rds" {
   source = "../../rds"
 
-  aws_region             = var.aws_region
-  project_name           = var.project_name
-  environment            = var.environment
-  vpc_id                 = module.vpc.vpc_id
-  private_db_subnet_ids  = module.vpc.private_db_subnet_ids
-  availability_zones     = module.vpc.availability_zones
-  kms_key_arn            = module.security.kms_key_arn
-  sg_rds_id              = module.security.sg_rds_id
-  secret_rds_arn         = module.security.secret_rds_arn
-  db_master_password     = random_password.db_master_password.result
+  aws_region            = var.aws_region
+  project_name          = var.project_name
+  environment           = var.environment
+  vpc_id                = module.vpc.vpc_id
+  private_db_subnet_ids = module.vpc.private_db_subnet_ids
+  availability_zones    = module.vpc.availability_zones
+  kms_key_arn           = module.security.kms_key_arn
+  sg_rds_id             = module.security.sg_rds_id
+  secret_rds_arn        = module.security.secret_rds_arn
+  db_master_password    = random_password.db_master_password.result
 
-  aurora_instance_class  = "db.t3.medium" # dev: barato. prod usará db.r6g.large
-  aurora_engine_version  = "15.4"
-  aurora_database_name   = "reservas_db"
-  backup_retention_days  = 7
+  aurora_instance_class     = "db.t3.medium" # dev: barato. prod usará db.r6g.large
+  aurora_engine_version     = "15.8"
+  aurora_database_name      = "reservas_db"
+  backup_retention_days     = 7
   aws_backup_retention_days = 30
 
   tags = var.tags
@@ -113,17 +113,17 @@ module "rds" {
 module "elasticache" {
   source = "../../elasticache"
 
-  aws_region             = var.aws_region
-  project_name           = var.project_name
-  environment             = var.environment
-  vpc_id                 = module.vpc.vpc_id
-  private_db_subnet_ids  = module.vpc.private_db_subnet_ids
-  availability_zones     = module.vpc.availability_zones
-  sg_elasticache_id      = module.security.sg_elasticache_id
-  kms_key_arn            = module.security.kms_key_arn
-  node_type              = "cache.t3.micro" # dev: barato. prod usará cache.r6g.large
-  redis_engine_version   = "7.0"
-  redis_auth_token       = random_password.redis_auth_token.result
+  aws_region            = var.aws_region
+  project_name          = var.project_name
+  environment           = var.environment
+  vpc_id                = module.vpc.vpc_id
+  private_db_subnet_ids = module.vpc.private_db_subnet_ids
+  availability_zones    = module.vpc.availability_zones
+  sg_elasticache_id     = module.security.sg_elasticache_id
+  kms_key_arn           = module.security.kms_key_arn
+  node_type             = "cache.t3.micro" # dev: barato. prod usará cache.r6g.large
+  redis_engine_version  = "7.0"
+  redis_auth_token      = random_password.redis_auth_token.result
 
   tags = var.tags
 }
@@ -142,11 +142,11 @@ module "messaging" {
 module "s3" {
   source = "../../s3"
 
-  project_name            = var.project_name
-  environment             = var.environment
-  kms_key_arn             = module.security.kms_key_arn
-  allowed_upload_origins  = ["http://localhost:3001"]
-  tags                    = var.tags
+  project_name           = var.project_name
+  environment            = var.environment
+  kms_key_arn            = module.security.kms_key_arn
+  allowed_upload_origins = ["http://localhost:3001"]
+  tags                   = var.tags
 }
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -160,6 +160,7 @@ module "ecr" {
   aws_region   = var.aws_region
   project_name = var.project_name
   environment  = var.environment
+  kms_key_arn  = module.security.kms_key_arn
   tags         = var.tags
 }
 
@@ -188,49 +189,49 @@ module "alb" {
 module "ecs_fargate" {
   source = "../../ecs-fargate"
 
-  aws_region            = var.aws_region
-  project_name          = var.project_name
-  environment           = var.environment
-  vpc_id                = module.vpc.vpc_id
-  private_subnet_ids    = module.vpc.private_app_subnet_ids
-  sg_ecs_id             = module.security.sg_ecs_id
-  api_target_group_arn  = module.alb.api_target_group_arn
-  web_target_group_arn  = module.alb.web_target_group_arn
-  kms_key_arn           = module.security.kms_key_arn
+  aws_region           = var.aws_region
+  project_name         = var.project_name
+  environment          = var.environment
+  vpc_id               = module.vpc.vpc_id
+  private_subnet_ids   = module.vpc.private_app_subnet_ids
+  sg_ecs_id            = module.security.sg_ecs_id
+  api_target_group_arn = module.alb.api_target_group_arn
+  web_target_group_arn = module.alb.web_target_group_arn
+  kms_key_arn          = module.security.kms_key_arn
 
   api_image_uri = "${module.ecr.api_repository_url}:latest"
   web_image_uri = "${module.ecr.web_repository_url}:latest"
 
-  api_cpu        = 256
-  api_memory     = 512
-  web_cpu        = 256
-  web_memory     = 512
-  desired_count  = 1
+  api_cpu       = 256
+  api_memory    = 512
+  web_cpu       = 256
+  web_memory    = 512
+  desired_count = 1
 
   # ── Nuevo: base de datos ──
-  rds_proxy_endpoint    = module.rds.rds_proxy_endpoint
-  aurora_database_name  = module.rds.aurora_database_name
-  aurora_port           = module.rds.aurora_port
-  secret_rds_arn        = module.security.secret_rds_arn
+  rds_proxy_endpoint   = module.rds.rds_proxy_endpoint
+  aurora_database_name = module.rds.aurora_database_name
+  aurora_port          = module.rds.aurora_port
+  secret_rds_arn       = module.security.secret_rds_arn
 
   # ── Nuevo: cache ──
   redis_primary_endpoint = module.elasticache.redis_primary_endpoint
-  redis_port              = module.elasticache.redis_port
+  redis_port             = module.elasticache.redis_port
 
   # ── Nuevo: S3 ──
-  s3_bucket_public       = module.s3.uploads_public_bucket_name
-  s3_bucket_private      = module.s3.uploads_private_bucket_name
-  s3_uploads_policy_arn  = module.s3.backend_uploads_policy_arn
+  s3_bucket_public      = module.s3.uploads_public_bucket_name
+  s3_bucket_private     = module.s3.uploads_private_bucket_name
+  s3_uploads_policy_arn = module.s3.backend_uploads_policy_arn
 
   # ── Nuevo: mensajería ──
-  sns_topic_reservas_arn             = module.messaging.sns_topic_reservas_arn
-  sns_topic_pagos_arn                = module.messaging.sns_topic_pagos_arn
-  sqs_reservas_notificaciones_arn     = module.messaging.sqs_reservas_notificaciones_arn
-  sqs_pagos_notificaciones_arn        = module.messaging.sqs_pagos_notificaciones_arn
-  sqs_reservas_pagos_arn              = module.messaging.sqs_reservas_pagos_arn
-  sqs_reservas_notificaciones_url     = module.messaging.sqs_reservas_notificaciones_url
-  sqs_pagos_notificaciones_url        = module.messaging.sqs_pagos_notificaciones_url
-  sqs_reservas_pagos_url              = module.messaging.sqs_reservas_pagos_url
+  sns_topic_reservas_arn          = module.messaging.sns_topic_reservas_arn
+  sns_topic_pagos_arn             = module.messaging.sns_topic_pagos_arn
+  sqs_reservas_notificaciones_arn = module.messaging.sqs_reservas_notificaciones_arn
+  sqs_pagos_notificaciones_arn    = module.messaging.sqs_pagos_notificaciones_arn
+  sqs_reservas_pagos_arn          = module.messaging.sqs_reservas_pagos_arn
+  sqs_reservas_notificaciones_url = module.messaging.sqs_reservas_notificaciones_url
+  sqs_pagos_notificaciones_url    = module.messaging.sqs_pagos_notificaciones_url
+  sqs_reservas_pagos_url          = module.messaging.sqs_reservas_pagos_url
 
   tags = var.tags
 }
@@ -243,6 +244,7 @@ module "api_gateway" {
   project_name = var.project_name
   environment  = var.environment
   alb_dns_name = module.alb.alb_dns_name
+  kms_key_arn  = module.security.kms_key_arn
   tags         = var.tags
 }
 

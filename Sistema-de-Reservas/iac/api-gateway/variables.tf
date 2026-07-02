@@ -18,6 +18,11 @@ variable "alb_dns_name" {
   type        = string
 }
 
+variable "kms_key_arn" {
+  description = "ARN de la clave KMS para cifrar los logs de CloudWatch"
+  type        = string
+}
+
 variable "tags" {
   type    = map(string)
   default = {}

@@ -36,6 +36,8 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true # Requerido por VPC Endpoints de tipo Interface
@@ -255,9 +257,55 @@ resource "aws_vpc_endpoint" "ssm" {
 # ─────────────────────────────────────────────────────────────────────────────
 # CKV2_AWS_11: VPC FLOW LOGS — trazabilidad de tráfico de red
 # ─────────────────────────────────────────────────────────────────────────────
+resource "aws_kms_key" "vpc_flow_logs" {
+  description             = "Clave KMS para los logs de VPC Flow Logs de ${local.name_prefix}"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableIAMUserPermissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${local.name_prefix}-vpc-flow-logs-kms"
+  }
+}
+
+resource "aws_kms_alias" "vpc_flow_logs" {
+  name          = "alias/${local.name_prefix}-vpc-flow-logs"
+  target_key_id = aws_kms_key.vpc_flow_logs.key_id
+}
+
 resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
   name              = "/aws/vpc/flowlogs/${local.name_prefix}"
-  retention_in_days = 30
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.vpc_flow_logs.arn
 
   tags = {
     Name = "${local.name_prefix}-vpc-flow-logs"

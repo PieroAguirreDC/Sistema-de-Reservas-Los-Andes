@@ -24,6 +24,35 @@ locals {
 # Solo lo escribe el pipeline de CI/CD (build de Next.js export). Lectura
 # pública vía CloudFront (no directo a S3).
 # ═════════════════════════════════════════════════════════════════════════════
+resource "aws_s3_bucket" "access_logs" {
+  bucket = "${local.name_prefix}-s3-access-logs"
+  tags   = local.base_tags
+}
+
+resource "aws_s3_bucket_versioning" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "access_logs" {
+  bucket                  = aws_s3_bucket.access_logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket" "frontend_static" {
   bucket = "${local.name_prefix}-frontend-static"
   tags   = local.base_tags
@@ -44,6 +73,22 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "frontend_static" 
       kms_master_key_id = var.kms_key_arn
     }
     bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_logging" "frontend_static" {
+  bucket        = aws_s3_bucket.frontend_static.id
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "frontend-static/"
+}
+
+resource "aws_s3_bucket_notification" "frontend_static" {
+  bucket = aws_s3_bucket.frontend_static.id
+
+  topic {
+    topic_arn     = aws_sns_topic.bucket_events.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = ""
   }
 }
 
@@ -80,6 +125,24 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "uploads_public" {
       kms_master_key_id = var.kms_key_arn
     }
     bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_logging" "uploads_public" {
+  bucket        = aws_s3_bucket.uploads_public.id
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "uploads-public/"
+}
+
+resource "aws_s3_bucket_notification" "uploads_public" {
+  bucket = aws_s3_bucket.uploads_public.id
+
+  depends_on = [aws_sns_topic_policy.bucket_events]
+
+  topic {
+    topic_arn     = aws_sns_topic.bucket_events.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = ""
   }
 }
 
@@ -151,6 +214,24 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "uploads_private" 
   }
 }
 
+resource "aws_s3_bucket_logging" "uploads_private" {
+  bucket        = aws_s3_bucket.uploads_private.id
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "uploads-private/"
+}
+
+resource "aws_s3_bucket_notification" "uploads_private" {
+  bucket = aws_s3_bucket.uploads_private.id
+
+  depends_on = [aws_sns_topic_policy.bucket_events]
+
+  topic {
+    topic_arn     = aws_sns_topic.bucket_events.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = ""
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "uploads_private" {
   bucket                  = aws_s3_bucket.uploads_private.id
   block_public_acls       = true
@@ -212,9 +293,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "uploads_private" {
 # ═════════════════════════════════════════════════════════════════════════════
 data "aws_iam_policy_document" "backend_uploads_access" {
   statement {
-    sid    = "AllowPutPublicImages"
-    effect = "Allow"
-    actions = ["s3:PutObject"]
+    sid       = "AllowPutPublicImages"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
     resources = ["${aws_s3_bucket.uploads_public.arn}/*"]
     condition {
       test     = "StringLike"
@@ -224,9 +305,9 @@ data "aws_iam_policy_document" "backend_uploads_access" {
   }
 
   statement {
-    sid    = "AllowPutPrivateFiles"
-    effect = "Allow"
-    actions = ["s3:PutObject"]
+    sid       = "AllowPutPrivateFiles"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
     resources = ["${aws_s3_bucket.uploads_private.arn}/*"]
     condition {
       test     = "StringLike"
@@ -248,6 +329,38 @@ data "aws_iam_policy_document" "backend_uploads_access" {
     actions   = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.uploads_public.arn}/*"]
   }
+}
+
+resource "aws_sns_topic" "bucket_events" {
+  name              = "${local.name_prefix}-s3-events"
+  kms_master_key_id = var.kms_key_arn
+  tags              = local.base_tags
+}
+
+resource "aws_sns_topic_policy" "bucket_events" {
+  arn = aws_sns_topic.bucket_events.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid    = "AllowS3Publish"
+      Effect = "Allow"
+      Principal = {
+        Service = "s3.amazonaws.com"
+      }
+      Action   = "sns:Publish"
+      Resource = aws_sns_topic.bucket_events.arn
+      Condition = {
+        ArnLike = {
+          "aws:SourceArn" = [
+            aws_s3_bucket.frontend_static.arn,
+            aws_s3_bucket.uploads_public.arn,
+            aws_s3_bucket.uploads_private.arn
+          ]
+        }
+      }
+    }]
+  })
 }
 
 resource "aws_iam_policy" "backend_uploads_access" {

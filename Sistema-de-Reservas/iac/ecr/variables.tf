@@ -14,6 +14,11 @@ variable "environment" {
   default = "dev"
 }
 
+variable "kms_key_arn" {
+  description = "ARN de la clave KMS para cifrar repositorios ECR"
+  type        = string
+}
+
 variable "tags" {
   type    = map(string)
   default = {}

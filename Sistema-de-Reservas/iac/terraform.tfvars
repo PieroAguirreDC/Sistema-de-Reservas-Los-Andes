@@ -19,7 +19,7 @@ kms_deletion_window = 7
 
 # Aurora PostgreSQL
 aurora_instance_class     = "db.t3.medium"
-aurora_engine_version     = "15.4"
+aurora_engine_version     = "15.3"
 aurora_database_name      = "reservas_db"
 aurora_port               = 5432
 backup_retention_days     = 7

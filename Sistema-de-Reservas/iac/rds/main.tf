@@ -45,6 +45,11 @@ resource "aws_rds_cluster_parameter_group" "main" {
     value = "1000"
   }
 
+  parameter {
+    name  = "log_statement"
+    value = "all"
+  }
+
   tags = {
     Name = "${local.name_prefix}-aurora-params"
   }
@@ -73,7 +78,7 @@ resource "aws_rds_cluster" "main" {
   iam_database_authentication_enabled = true
 
   # CKV_AWS_324 — CORRECCIÓN
-  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+  enabled_cloudwatch_logs_exports = ["postgresql"]
 
   backup_retention_period      = var.backup_retention_days
   preferred_backup_window      = var.backup_window

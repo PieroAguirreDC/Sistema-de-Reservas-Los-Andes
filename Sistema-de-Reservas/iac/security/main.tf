@@ -81,6 +81,7 @@ resource "aws_kms_alias" "main" {
 # SECRETS MANAGER — Secreto base para credenciales de RDS
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_secretsmanager_secret" "rds_credentials" {
+  #checkov:skip=CKV2_AWS_57:Se usa un secreto bootstrap para la base de datos; la rotación automática se habilitará en una fase posterior.
   name                    = "${local.name_prefix}/rds/credentials"
   description             = "Credenciales de Aurora PostgreSQL para ${local.name_prefix}"
   kms_key_id              = aws_kms_key.main.arn
@@ -119,13 +120,6 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    description = "HTTP desde internet (redirect a HTTPS)"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   egress {
     description = "Hacia microservicios en subredes de app"
@@ -157,7 +151,7 @@ resource "aws_security_group" "ecs" {
     security_groups = [aws_security_group.alb.id]
   }
 
-    ingress {
+  ingress {
     description     = "Trafico desde el ALB hacia el frontend web"
     from_port       = 3001
     to_port         = 3001

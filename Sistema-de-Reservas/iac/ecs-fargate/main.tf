@@ -38,14 +38,14 @@ resource "aws_iam_role_policy_attachment" "ecs_execution" {
 
 resource "aws_cloudwatch_log_group" "api" {
   name              = "/ecs/${local.name_prefix}/api"
-  retention_in_days = 365              # fix CKV_AWS_338
-  kms_key_id        = var.kms_key_arn  # fix CKV_AWS_158
+  retention_in_days = 365             # fix CKV_AWS_338
+  kms_key_id        = var.kms_key_arn # fix CKV_AWS_158
 }
 
 resource "aws_cloudwatch_log_group" "web" {
   name              = "/ecs/${local.name_prefix}/web"
-  retention_in_days = 365              # fix CKV_AWS_338
-  kms_key_id        = var.kms_key_arn  # fix CKV_AWS_158
+  retention_in_days = 365             # fix CKV_AWS_338
+  kms_key_id        = var.kms_key_arn # fix CKV_AWS_158
 }
 
 resource "aws_ecs_cluster" "main" {
@@ -133,9 +133,10 @@ resource "aws_ecs_task_definition" "api" {
   task_role_arn            = aws_iam_role.ecs_task.arn
 
   container_definitions = jsonencode([{
-    name      = "api"
-    image     = var.api_image_uri
-    essential = true
+    name                   = "api"
+    image                  = var.api_image_uri
+    essential              = true
+    readonlyRootFilesystem = true
     portMappings = [{
       containerPort = 3000
       protocol      = "tcp"
@@ -149,22 +150,22 @@ resource "aws_ecs_task_definition" "api" {
       }
     }
     environment = [
-      { name = "NODE_ENV",   value = var.environment },
-      { name = "PORT",       value = "3000" },
-      { name = "DB_HOST",    value = var.rds_proxy_endpoint },
-      { name = "DB_PORT",    value = tostring(var.aurora_port) },
-      { name = "DB_NAME",    value = var.aurora_database_name },
-      { name = "DB_SSL",     value = "true" },
+      { name = "NODE_ENV", value = var.environment },
+      { name = "PORT", value = "3000" },
+      { name = "DB_HOST", value = var.rds_proxy_endpoint },
+      { name = "DB_PORT", value = tostring(var.aurora_port) },
+      { name = "DB_NAME", value = var.aurora_database_name },
+      { name = "DB_SSL", value = "true" },
       { name = "REDIS_HOST", value = var.redis_primary_endpoint },
       { name = "REDIS_PORT", value = tostring(var.redis_port) },
       { name = "AWS_REGION", value = var.aws_region },
-      { name = "S3_BUCKET_PUBLIC",  value = var.s3_bucket_public },
+      { name = "S3_BUCKET_PUBLIC", value = var.s3_bucket_public },
       { name = "S3_BUCKET_PRIVATE", value = var.s3_bucket_private },
       { name = "SNS_TOPIC_RESERVAS_ARN", value = var.sns_topic_reservas_arn },
-      { name = "SNS_TOPIC_PAGOS_ARN",    value = var.sns_topic_pagos_arn },
+      { name = "SNS_TOPIC_PAGOS_ARN", value = var.sns_topic_pagos_arn },
       { name = "SQS_RESERVAS_NOTIFICACIONES_URL", value = var.sqs_reservas_notificaciones_url },
-      { name = "SQS_PAGOS_NOTIFICACIONES_URL",    value = var.sqs_pagos_notificaciones_url },
-      { name = "SQS_RESERVAS_PAGOS_URL",          value = var.sqs_reservas_pagos_url },
+      { name = "SQS_PAGOS_NOTIFICACIONES_URL", value = var.sqs_pagos_notificaciones_url },
+      { name = "SQS_RESERVAS_PAGOS_URL", value = var.sqs_reservas_pagos_url },
     ]
     secrets = [
       { name = "DB_USERNAME", valueFrom = "${var.secret_rds_arn}:username::" },
@@ -182,9 +183,10 @@ resource "aws_ecs_task_definition" "web" {
   execution_role_arn       = aws_iam_role.ecs_execution.arn
 
   container_definitions = jsonencode([{
-    name      = "web"
-    image     = var.web_image_uri
-    essential = true
+    name                   = "web"
+    image                  = var.web_image_uri
+    essential              = true
+    readonlyRootFilesystem = true
     portMappings = [{
       containerPort = 3001
       protocol      = "tcp"

@@ -22,6 +22,69 @@ locals {
 # ─────────────────────────────────────────────────────────────────────────────
 # APPLICATION LOAD BALANCER
 # ─────────────────────────────────────────────────────────────────────────────
+resource "aws_s3_bucket" "access_logs" {
+  bucket = "${local.name_prefix}-alb-logs"
+  tags   = local.base_tags
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  rule {
+    id     = "expire-old-logs"
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    expiration {
+      days = 365
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "access_logs" {
+  bucket                  = aws_s3_bucket.access_logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid    = "AllowELBLogs"
+      Effect = "Allow"
+      Principal = {
+        AWS = "arn:aws:iam::127311923021:root"
+      }
+      Action   = "s3:PutObject"
+      Resource = "${aws_s3_bucket.access_logs.arn}/*"
+    }]
+  })
+}
+
 resource "aws_lb" "main" {
   name               = "${local.name_prefix}-alb"
   internal           = false
@@ -29,7 +92,13 @@ resource "aws_lb" "main" {
   security_groups    = [var.sg_alb_id]
   subnets            = var.public_subnet_ids
 
-  enable_deletion_protection = var.environment == "prod" ? true : false
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
+
+  access_logs {
+    bucket  = aws_s3_bucket.access_logs.bucket
+    enabled = true
+  }
 
   tags = {
     Name = "${local.name_prefix}-alb"
@@ -86,33 +155,12 @@ resource "aws_lb_target_group" "web" {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LISTENER HTTP — Redirige todo a HTTPS
+# LISTENER HTTP — Enruta todo a los target groups
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
   protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
-
-# ─────────────────────────────────────────────────────────────────────────────
-# LISTENER HTTPS — Enruta por path
-# ─────────────────────────────────────────────────────────────────────────────
-resource "aws_lb_listener" "https" {
-  count             = var.certificate_arn != "" ? 1 : 0
-  load_balancer_arn = aws_lb.main.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = var.certificate_arn
 
   default_action {
     type             = "forward"
@@ -124,8 +172,7 @@ resource "aws_lb_listener" "https" {
 # LISTENER RULE — /api/v1/* va al target group de la API
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_lb_listener_rule" "api" {
-  count        = var.certificate_arn != "" ? 1 : 0
-  listener_arn = aws_lb_listener.https[0].arn
+  listener_arn = aws_lb_listener.http.arn
   priority     = 100
 
   action {
@@ -140,9 +187,48 @@ resource "aws_lb_listener_rule" "api" {
   }
 }
 
+resource "aws_s3_bucket" "waf_logs" {
+  bucket = "${local.name_prefix}-waf-logs"
+  tags   = local.base_tags
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "waf_logs" {
+  bucket = aws_s3_bucket.waf_logs.id
+
+  rule {
+    id     = "expire-old-waf-logs"
+    status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
+
+    expiration {
+      days = 365
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "waf_logs" {
+  bucket = aws_s3_bucket.waf_logs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "waf_logs" {
+  bucket                  = aws_s3_bucket.waf_logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_wafv2_web_acl" "main" {
-  name  = "${local.name_prefix}-waf"
-  scope = "REGIONAL"
+  name        = "${local.name_prefix}-waf"
+  scope       = "REGIONAL"
   description = "WAF para el ALB publico"
 
   default_action {

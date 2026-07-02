@@ -50,7 +50,7 @@ resource "aws_apigatewayv2_route" "default" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "ANY /{proxy+}"
   target             = "integrations/${aws_apigatewayv2_integration.alb.id}"
-  authorization_type = "NONE"   # antes: "AWS_IAM"
+  authorization_type = "AWS_IAM"
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -69,5 +69,6 @@ resource "aws_apigatewayv2_stage" "default" {
 
 resource "aws_cloudwatch_log_group" "api_gw" {
   name              = "/aws/apigateway/${local.name_prefix}"
-  retention_in_days = 7
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
 }

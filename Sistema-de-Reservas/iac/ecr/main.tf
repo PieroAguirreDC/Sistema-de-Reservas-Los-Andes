@@ -20,10 +20,16 @@ locals {
 
 resource "aws_ecr_repository" "api" {
   name                 = "${local.name_prefix}/api"
-  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key         = var.kms_key_arn
   }
 
   tags = { Name = "${local.name_prefix}-api" }
@@ -31,10 +37,16 @@ resource "aws_ecr_repository" "api" {
 
 resource "aws_ecr_repository" "web" {
   name                 = "${local.name_prefix}/web"
-  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key         = var.kms_key_arn
   }
 
   tags = { Name = "${local.name_prefix}-web" }
