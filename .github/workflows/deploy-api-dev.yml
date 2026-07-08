@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - main
     paths:
       - "Sistema-de-Reservas/app/api/**"
 
@@ -75,7 +76,7 @@ jobs:
           docker build \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-            -f Sistema-de-Reservas/app/api/Dockerfile.dev \
+            -f Sistema-de-Reservas/app/api/Dockerfile \
             Sistema-de-Reservas/app/api/
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
