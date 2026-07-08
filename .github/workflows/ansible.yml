@@ -1,0 +1,39 @@
+name: CI-Ansible
+
+on:
+  pull_request:
+    branches:
+      - main
+      - developer
+    paths:
+      - "Sistema-de-Reservas/ansible/**"
+      - ".github/workflows/ansible.yml"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
+jobs:
+  ansible-lint:
+    name: Validar Playbooks de Ansible
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar Ansible, boto3 y ansible-lint
+        run: |
+          pip install ansible boto3 botocore ansible-lint
+          ansible-galaxy collection install community.general amazon.aws
+
+      - name: Verificar sintaxis del playbook
+        run: |
+          ansible-playbook --syntax-check \
+            -i Sistema-de-Reservas/ansible/inventory/hosts.ini \
+            Sistema-de-Reservas/ansible/playbook.yml
+
+      - name: Ejecutar ansible-lint (analisis de buenas practicas)
+        run: ansible-lint Sistema-de-Reservas/ansible/playbook.yml
