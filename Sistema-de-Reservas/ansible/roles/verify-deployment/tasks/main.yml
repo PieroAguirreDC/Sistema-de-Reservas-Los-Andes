@@ -1,0 +1,59 @@
+---
+# ─── Verificación del servicio ECS API ───────────────────────────────────────
+- name: Esperar a que el servicio ECS API este estable
+  shell: |
+    aws ecs describe-services \
+      --cluster reservas-dev-cluster \
+      --services reservas-dev-api-svc \
+      --query 'services[0].{Running:runningCount,Desired:desiredCount}' \
+      --output json --region us-east-1
+  register: ecs_api_status
+  until: (ecs_api_status.stdout | from_json).Running == (ecs_api_status.stdout | from_json).Desired
+  retries: 15
+  delay: 20
+
+- name: Mostrar estado del servicio ECS API
+  debug:
+    msg: "ECS API — Running: {{ (ecs_api_status.stdout | from_json).Running }} / Desired: {{ (ecs_api_status.stdout | from_json).Desired }}"
+
+# ─── Verificación del servicio ECS Web ───────────────────────────────────────
+- name: Esperar a que el servicio ECS Web este estable
+  shell: |
+    aws ecs describe-services \
+      --cluster reservas-dev-cluster \
+      --services reservas-dev-web-svc \
+      --query 'services[0].{Running:runningCount,Desired:desiredCount}' \
+      --output json --region us-east-1
+  register: ecs_web_status
+  until: (ecs_web_status.stdout | from_json).Running == (ecs_web_status.stdout | from_json).Desired
+  retries: 15
+  delay: 20
+
+- name: Mostrar estado del servicio ECS Web
+  debug:
+    msg: "ECS Web — Running: {{ (ecs_web_status.stdout | from_json).Running }} / Desired: {{ (ecs_web_status.stdout | from_json).Desired }}"
+
+# ─── Obtener DNS del ALB ──────────────────────────────────────────────────────
+- name: Obtener DNS del ALB
+  shell: |
+    aws elbv2 describe-load-balancers \
+      --names reservas-dev-alb \
+      --query 'LoadBalancers[0].DNSName' \
+      --output text --region us-east-1
+  register: alb_dns
+
+# ─── Health check via ALB ─────────────────────────────────────────────────────
+- name: Verificar health check de la API via ALB
+  uri:
+    url: "http://{{ alb_dns.stdout }}/api/v1/health"
+    status_code: 200
+    timeout: 10
+  register: health_check
+  retries: 5
+  delay: 15
+  until: health_check.status == 200
+
+# ─── Resultado final ──────────────────────────────────────────────────────────
+- name: Despliegue verificado correctamente
+  debug:
+    msg: "Sistema de Reservas Hotel Los Andes desplegado y respondiendo en http://{{ alb_dns.stdout }}"
