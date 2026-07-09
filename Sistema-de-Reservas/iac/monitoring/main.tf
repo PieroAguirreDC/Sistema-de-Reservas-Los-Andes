@@ -283,7 +283,8 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric"
         properties = {
-          title  = "ECS microservicios — CPU & Memory"
+          region = "us-east-1"
+          title  = "ECS API — CPU & Memory"
           period = 60
           metrics = [
             ["AWS/ECS", "CPUUtilization", "ClusterName", var.cluster_name, "ServiceName", var.usuarios_service_name],
@@ -302,6 +303,7 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric"
         properties = {
+          region = "us-east-1"
           title  = "ALB — Requests & Errors"
           period = 60
           metrics = [
