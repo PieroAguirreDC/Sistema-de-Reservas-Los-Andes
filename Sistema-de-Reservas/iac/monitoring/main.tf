@@ -125,6 +125,7 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric"
         properties = {
+          region = "us-east-1"
           title  = "ECS API — CPU & Memory"
           period = 60
           metrics = [
@@ -136,6 +137,7 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric"
         properties = {
+          region = "us-east-1"
           title  = "ALB — Requests & Errors"
           period = 60
           metrics = [
