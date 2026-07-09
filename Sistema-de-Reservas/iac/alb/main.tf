@@ -23,7 +23,7 @@ locals {
 # APPLICATION LOAD BALANCER
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_s3_bucket" "access_logs" {
-  bucket = "${local.name_prefix}-alb-logs"
+  bucket = "${local.name_prefix}-alb-logs-dev"
   tags   = local.base_tags
 }
 
@@ -350,7 +350,7 @@ resource "aws_lb_listener_rule" "api_fallback" {
 }
 
 resource "aws_s3_bucket" "waf_logs" {
-  bucket = "${local.name_prefix}-waf-logs"
+  bucket = "${local.name_prefix}-waf-logs-dev"
   tags   = local.base_tags
 }
 

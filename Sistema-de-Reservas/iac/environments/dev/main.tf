@@ -103,8 +103,8 @@ module "rds" {
   aurora_instance_class     = "db.t3.medium" # dev: barato. prod usará db.r6g.large
   aurora_engine_version     = "15.8"
   aurora_database_name      = "reservas_db"
-  backup_retention_days     = 7
-  aws_backup_retention_days = 30
+  backup_retention_days     = 1
+  aws_backup_retention_days = 7
 
   tags = var.tags
 }
