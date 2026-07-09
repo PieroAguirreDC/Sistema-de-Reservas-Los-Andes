@@ -141,6 +141,15 @@ data "aws_iam_policy_document" "ecs_execution_secrets" {
     actions   = ["secretsmanager:GetSecretValue"]
     resources = [var.secret_rds_arn]
   }
+
+  # KMS requerido para:
+  # 1) Descifrar el secret de Secrets Manager (cifrado con KMS)
+  # 2) Escribir en el CloudWatch log group cifrado con KMS
+  statement {
+    effect  = "Allow"
+    actions = ["kms:Decrypt", "kms:GenerateDataKey"]
+    resources = [var.kms_key_arn]
+  }
 }
 
 resource "aws_iam_role_policy" "ecs_execution_secrets" {

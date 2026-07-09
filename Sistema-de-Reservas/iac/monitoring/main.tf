@@ -303,7 +303,6 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric"
         properties = {
-          region = "us-east-2"
           title  = "ALB — Requests & Errors"
           period = 60
           metrics = [

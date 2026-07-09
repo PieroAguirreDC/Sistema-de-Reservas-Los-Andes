@@ -40,12 +40,13 @@ jobs:
         continue-on-error: true
 
       - name: Ejecutar analisis de SonarQube
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
+            -Dsonar.organization=SDRDHS
             -Dsonar.projectKey=hotel-losandes
             -Dsonar.projectName="Sistema de Reservas Hotel Los Andes"
             -Dsonar.sources=Sistema-de-Reservas/app/api/src,Sistema-de-Reservas/app/web/src
