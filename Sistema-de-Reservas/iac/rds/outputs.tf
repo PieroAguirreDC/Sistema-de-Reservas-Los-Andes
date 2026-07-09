@@ -1,39 +1,39 @@
-# ─── CLUSTER ──────────────────────────────────────────────────────────────────
+# ─── INSTANCIA ────────────────────────────────────────────────────────────────
 output "aurora_cluster_id" {
-  description = "ID del cluster Aurora — referencia general"
-  value       = aws_rds_cluster.main.cluster_identifier
+  description = "Identifier de la instancia RDS PostgreSQL"
+  value       = aws_db_instance.main.identifier
 }
 
 output "aurora_cluster_arn" {
-  description = "ARN del cluster Aurora — consumido por: aws_backup_selection"
-  value       = aws_rds_cluster.main.arn
+  description = "ARN de la instancia RDS — consumido por: aws_backup_selection"
+  value       = aws_db_instance.main.arn
 }
 
 # ─── ENDPOINTS ────────────────────────────────────────────────────────────────
 output "aurora_endpoint_writer" {
-  description = "Endpoint de escritura del cluster — consumido por: rds_proxy"
-  value       = aws_rds_cluster.main.endpoint
+  description = "Hostname del endpoint RDS — consumido por: ecs-fargate"
+  value       = aws_db_instance.main.address
 }
 
 output "aurora_endpoint_reader" {
-  description = "Endpoint de lectura del cluster — consumido por: ecs-fargate (lecturas)"
-  value       = aws_rds_cluster.main.reader_endpoint
+  description = "Hostname del endpoint RDS (instancia única, mismo que writer)"
+  value       = aws_db_instance.main.address
 }
 
 output "rds_proxy_endpoint" {
-  description = "Endpoint del RDS Proxy — consumido por: ecs-fargate (conexión principal)"
-  value       = aws_db_proxy.main.endpoint
+  description = "Endpoint de conexión a la BD — usa RDS directamente (RDS Proxy deshabilitado en free tier)"
+  value       = aws_db_instance.main.address
 }
 
 # ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
 output "aurora_port" {
-  description = "Puerto de Aurora PostgreSQL"
-  value       = aws_rds_cluster.main.port
+  description = "Puerto de RDS PostgreSQL"
+  value       = aws_db_instance.main.port
 }
 
 output "aurora_database_name" {
   description = "Nombre de la base de datos — consumido por: ecs-fargate (variables de entorno)"
-  value       = aws_rds_cluster.main.database_name
+  value       = aws_db_instance.main.db_name
 }
 
 # ─── BACKUP ───────────────────────────────────────────────────────────────────

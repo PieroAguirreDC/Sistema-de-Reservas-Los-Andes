@@ -33,12 +33,12 @@ resource "aws_db_subnet_group" "main" {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PARAMETER GROUP — Configuración del motor PostgreSQL
+# PARAMETER GROUP — Configuración del motor PostgreSQL estándar
 # ─────────────────────────────────────────────────────────────────────────────
-resource "aws_rds_cluster_parameter_group" "main" {
-  name        = "${local.name_prefix}-aurora-params"
-  family      = "aurora-postgresql15"
-  description = "Parameter group para Aurora PostgreSQL ${local.name_prefix}"
+resource "aws_db_parameter_group" "main" {
+  name        = "${local.name_prefix}-pg-params"
+  family      = "postgres15"
+  description = "Parameter group para RDS PostgreSQL ${local.name_prefix}"
 
   parameter {
     name  = "log_min_duration_statement"
@@ -51,107 +51,69 @@ resource "aws_rds_cluster_parameter_group" "main" {
   }
 
   tags = {
-    Name = "${local.name_prefix}-aurora-params"
+    Name = "${local.name_prefix}-pg-params"
   }
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# AURORA CLUSTER — Primary + Standby (Multi-AZ)
+# RDS PostgreSQL — instancia única (Free Tier: db.t3.micro)
+# Aurora no está disponible en cuentas free tier (FreeTierRestrictionError)
 # ─────────────────────────────────────────────────────────────────────────────
-resource "aws_rds_cluster" "main" {
-  cluster_identifier = "${local.name_prefix}-aurora-cluster"
-  engine             = "aurora-postgresql"
-  engine_version     = var.aurora_engine_version
-  database_name      = var.aurora_database_name
-  port               = var.aurora_port
+resource "aws_db_instance" "main" {
+  identifier = "${local.name_prefix}-db"
 
-  master_username = "admin_${var.project_name}"
-  master_password = var.db_master_password
+  engine         = "postgres"
+  engine_version = "15"
+  instance_class = "db.t3.micro"
+
+  db_name  = var.aurora_database_name
+  username = "admin_${var.project_name}"
+  password = var.db_master_password
+  port     = var.aurora_port
 
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [var.sg_rds_id]
+  parameter_group_name   = aws_db_parameter_group.main.name
 
+  # Almacenamiento — Free Tier: hasta 20 GB gp2
+  allocated_storage = 20
+  storage_type      = "gp2"
   storage_encrypted = true
   kms_key_id        = var.kms_key_arn
 
-  # CKV_AWS_162
+  # Autenticación IAM
   iam_database_authentication_enabled = true
 
-  # CKV_AWS_324 — CORRECCIÓN
+  # Logs a CloudWatch
   enabled_cloudwatch_logs_exports = ["postgresql"]
 
-  backup_retention_period      = var.backup_retention_days
-  preferred_backup_window      = var.backup_window
-  preferred_maintenance_window = var.maintenance_window
+  # Backup
+  backup_retention_period = 1
+  backup_window           = var.backup_window
+  maintenance_window      = var.maintenance_window
+  copy_tags_to_snapshot   = true
 
-  # CKV_AWS_313
-  copy_tags_to_snapshot = true
+  # Free Tier: sin Multi-AZ ni standby
+  multi_az = false
 
-  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.main.name
-
-  deletion_protection       = true
-  skip_final_snapshot       = var.environment == "prod" ? false : true
-  final_snapshot_identifier = var.environment == "prod" ? "${local.name_prefix}-final-snapshot" : null
-
-  tags = {
-    Name = "${local.name_prefix}-aurora-cluster"
-  }
-}
-# ─────────────────────────────────────────────────────────────────────────────
-# INSTANCIA PRIMARY — Escritura (us-east-1a)
-# ─────────────────────────────────────────────────────────────────────────────
-resource "aws_rds_cluster_instance" "primary" {
-  identifier         = "${local.name_prefix}-aurora-primary"
-  cluster_identifier = aws_rds_cluster.main.id
-  instance_class     = var.aurora_instance_class
-  engine             = aws_rds_cluster.main.engine
-  engine_version     = aws_rds_cluster.main.engine_version
-
-  availability_zone            = var.availability_zones[0]
-  db_subnet_group_name         = aws_db_subnet_group.main.name
-  auto_minor_version_upgrade   = true
-  performance_insights_enabled = true
-
-  # CKV_AWS_354: Performance Insights cifrado con KMS CMK
-  performance_insights_kms_key_id = var.kms_key_arn
-
-  # CKV_AWS_118: Enhanced Monitoring cada 60 segundos
+  # Monitoring mejorado
   monitoring_interval = 60
   monitoring_role_arn = aws_iam_role.rds_enhanced_monitoring.arn
 
+  # Performance Insights
+  performance_insights_enabled          = true
+  performance_insights_kms_key_id       = var.kms_key_arn
+  performance_insights_retention_period = 7
+
+  deletion_protection = false
+  skip_final_snapshot = true
+
   tags = {
-    Name = "${local.name_prefix}-aurora-primary"
-    Role = "primary"
+    Name = "${local.name_prefix}-db"
   }
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
-# INSTANCIA STANDBY — Solo lectura (us-east-1b)
-# ─────────────────────────────────────────────────────────────────────────────
-resource "aws_rds_cluster_instance" "standby" {
-  identifier         = "${local.name_prefix}-aurora-standby"
-  cluster_identifier = aws_rds_cluster.main.id
-  instance_class     = var.aurora_instance_class
-  engine             = aws_rds_cluster.main.engine
-  engine_version     = aws_rds_cluster.main.engine_version
 
-  availability_zone            = var.availability_zones[1]
-  db_subnet_group_name         = aws_db_subnet_group.main.name
-  auto_minor_version_upgrade   = true
-  performance_insights_enabled = true
-
-  # CKV_AWS_354: Performance Insights cifrado con KMS CMK
-  performance_insights_kms_key_id = var.kms_key_arn
-
-  # CKV_AWS_118: Enhanced Monitoring cada 60 segundos
-  monitoring_interval = 60
-  monitoring_role_arn = aws_iam_role.rds_enhanced_monitoring.arn
-
-  tags = {
-    Name = "${local.name_prefix}-aurora-standby"
-    Role = "standby-readonly"
-  }
-}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # IAM ROLE para Enhanced Monitoring (RDS publica métricas del OS a CloudWatch)
@@ -179,91 +141,67 @@ resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# RDS PROXY — Pool de conexiones entre ECS y Aurora
+# RDS PROXY — Deshabilitado: no disponible en cuentas free tier
+# Para habilitar: descomentar y hacer terraform apply
 # ─────────────────────────────────────────────────────────────────────────────
-resource "aws_db_proxy" "main" {
-  name                   = "${local.name_prefix}-rds-proxy"
-  debug_logging          = false
-  engine_family          = "POSTGRESQL"
-  idle_client_timeout    = 1800
-  require_tls            = true
-  role_arn               = aws_iam_role.rds_proxy.arn
-  vpc_security_group_ids = [var.sg_rds_id]
-  vpc_subnet_ids         = var.private_db_subnet_ids
+# resource "aws_db_proxy" "main" {
+#   name                   = "${local.name_prefix}-rds-proxy"
+#   debug_logging          = false
+#   engine_family          = "POSTGRESQL"
+#   idle_client_timeout    = 1800
+#   require_tls            = true
+#   role_arn               = aws_iam_role.rds_proxy.arn
+#   vpc_security_group_ids = [var.sg_rds_id]
+#   vpc_subnet_ids         = var.private_db_subnet_ids
+#
+#   auth {
+#     auth_scheme = "SECRETS"
+#     iam_auth    = "DISABLED"
+#     secret_arn  = var.secret_rds_arn
+#   }
+#
+#   tags = {
+#     Name = "${local.name_prefix}-rds-proxy"
+#   }
+# }
+#
+# resource "aws_db_proxy_default_target_group" "main" {
+#   db_proxy_name = aws_db_proxy.main.name
+#
+#   connection_pool_config {
+#     max_connections_percent      = 100
+#     max_idle_connections_percent = 50
+#     connection_borrow_timeout    = 120
+#   }
+# }
+#
+# resource "aws_db_proxy_target" "main" {
+#   db_cluster_identifier = aws_rds_cluster.main.cluster_identifier
+#   db_proxy_name         = aws_db_proxy.main.name
+#   target_group_name     = aws_db_proxy_default_target_group.main.name
+# }
 
-  auth {
-    auth_scheme = "SECRETS"
-    iam_auth    = "DISABLED"
-    secret_arn  = var.secret_rds_arn
-  }
-
-  tags = {
-    Name = "${local.name_prefix}-rds-proxy"
-  }
-}
-
-resource "aws_db_proxy_default_target_group" "main" {
-  db_proxy_name = aws_db_proxy.main.name
-
-  connection_pool_config {
-    max_connections_percent      = 100
-    max_idle_connections_percent = 50
-    connection_borrow_timeout    = 120
-  }
-}
-
-resource "aws_db_proxy_target" "main" {
-  db_cluster_identifier = aws_rds_cluster.main.cluster_identifier
-  db_proxy_name         = aws_db_proxy.main.name
-  target_group_name     = aws_db_proxy_default_target_group.main.name
-}
-
-# ─────────────────────────────────────────────────────────────────────────────
-# IAM ROLE — Permite a RDS Proxy leer el secreto de Secrets Manager
-# ─────────────────────────────────────────────────────────────────────────────
-resource "aws_iam_role" "rds_proxy" {
-  name = "${local.name_prefix}-rds-proxy-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
-      Principal = { Service = "rds.amazonaws.com" }
-    }]
-  })
-
-  tags = {
-    Name = "${local.name_prefix}-rds-proxy-role"
-  }
-}
-
-resource "aws_iam_role_policy" "rds_proxy" {
-  name = "${local.name_prefix}-rds-proxy-policy"
-  role = aws_iam_role.rds_proxy.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
-        ]
-        Resource = [var.secret_rds_arn]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey"
-        ]
-        Resource = [var.kms_key_arn]
-      }
-    ]
-  })
-}
+# IAM ROLE para RDS Proxy — deshabilitado junto con el proxy
+# resource "aws_iam_role" "rds_proxy" {
+#   name = "${local.name_prefix}-rds-proxy-role"
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{ Action = "sts:AssumeRole", Effect = "Allow", Principal = { Service = "rds.amazonaws.com" } }]
+#   })
+#   tags = { Name = "${local.name_prefix}-rds-proxy-role" }
+# }
+#
+# resource "aws_iam_role_policy" "rds_proxy" {
+#   name = "${local.name_prefix}-rds-proxy-policy"
+#   role = aws_iam_role.rds_proxy.id
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       { Effect = "Allow", Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"], Resource = [var.secret_rds_arn] },
+#       { Effect = "Allow", Action = ["kms:Decrypt", "kms:GenerateDataKey"], Resource = [var.kms_key_arn] }
+#     ]
+#   })
+# }
 
 # ─────────────────────────────────────────────────────────────────────────────
 # AWS BACKUP — Vault y plan de respaldo centralizado
@@ -328,6 +266,6 @@ resource "aws_backup_selection" "rds" {
   iam_role_arn = aws_iam_role.aws_backup.arn
 
   resources = [
-    aws_rds_cluster.main.arn
+    aws_db_instance.main.arn
   ]
 }
