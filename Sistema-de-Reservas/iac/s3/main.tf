@@ -25,7 +25,7 @@ locals {
 # pública vía CloudFront (no directo a S3).
 # ═════════════════════════════════════════════════════════════════════════════
 resource "aws_s3_bucket" "access_logs" {
-  bucket = "${local.name_prefix}-s3-access-logs"
+  bucket = "${local.name_prefix}-s3-access-logs-dev"
   tags   = local.base_tags
 }
 
@@ -54,7 +54,7 @@ resource "aws_s3_bucket_public_access_block" "access_logs" {
 }
 
 resource "aws_s3_bucket" "frontend_static" {
-  bucket = "${local.name_prefix}-frontend-static"
+  bucket = "${local.name_prefix}-frontend-static-dev"
   tags   = local.base_tags
 }
 
@@ -85,6 +85,8 @@ resource "aws_s3_bucket_logging" "frontend_static" {
 resource "aws_s3_bucket_notification" "frontend_static" {
   bucket = aws_s3_bucket.frontend_static.id
 
+  depends_on = [aws_sns_topic_policy.bucket_events]
+
   topic {
     topic_arn     = aws_sns_topic.bucket_events.arn
     events        = ["s3:ObjectCreated:*"]
@@ -106,7 +108,7 @@ resource "aws_s3_bucket_public_access_block" "frontend_static" {
 # lectura pública vía CloudFront.
 # ═════════════════════════════════════════════════════════════════════════════
 resource "aws_s3_bucket" "uploads_public" {
-  bucket = "${local.name_prefix}-uploads-public"
+  bucket = "${local.name_prefix}-uploads-public-dev"
   tags   = local.base_tags
 }
 
@@ -192,7 +194,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "uploads_public" {
 # firmadas (presigned GET) con expiración corta, generadas por el backend.
 # ═════════════════════════════════════════════════════════════════════════════
 resource "aws_s3_bucket" "uploads_private" {
-  bucket = "${local.name_prefix}-uploads-private"
+  bucket = "${local.name_prefix}-uploads-private-dev"
   tags   = local.base_tags
 }
 
