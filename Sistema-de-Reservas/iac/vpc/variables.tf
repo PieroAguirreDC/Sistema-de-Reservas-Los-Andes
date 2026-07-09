@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "Región AWS donde se despliega la VPC"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "project_name" {

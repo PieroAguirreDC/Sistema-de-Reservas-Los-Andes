@@ -21,7 +21,7 @@ terraform {
   # backend "s3" {
   #   bucket         = "reservas-terraform-state"
   #   key            = "dev/terraform.tfstate"
-  #   region         = "us-east-1"
+  #   region         = "us-east-2"
   #   dynamodb_table = "reservas-terraform-locks"
   #   encrypt        = true
   # }
@@ -239,7 +239,10 @@ module "ecs_fargate" {
   sqs_reservas_notificaciones_url = module.messaging.sqs_reservas_notificaciones_url
   sqs_pagos_notificaciones_url    = module.messaging.sqs_pagos_notificaciones_url
   sqs_reservas_pagos_url          = module.messaging.sqs_reservas_pagos_url
-
+  # Auto Scaling
+  autoscale_min_capacity          = 1 
+  autoscale_max_capacity          = 3
+  autoscale_target_cpu            = 70
   tags = var.tags
 }
 

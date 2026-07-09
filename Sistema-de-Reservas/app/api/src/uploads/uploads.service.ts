@@ -9,7 +9,7 @@ const PRESIGNED_URL_TTL_SECONDS = 60;
 
 @Injectable()
 export class UploadsService {
-  private readonly s3 = new S3Client({ region: process.env.AWS_REGION || 'us-east-1' });
+  private readonly s3 = new S3Client({ region: process.env.AWS_REGION || 'us-east-2' });
 
   private readonly bucketPublic = process.env.S3_BUCKET_PUBLIC || '';
   private readonly bucketPrivate = process.env.S3_BUCKET_PRIVATE || '';
@@ -38,7 +38,7 @@ export class UploadsService {
       // OJO: esta URL directa a S3 solo será visible públicamente cuando
       // exista CloudFront delante del bucket (pendiente, iac/cdn no existe
       // aún). Por ahora esta respuesta solo sirve para SUBIR.
-      publicUrl: `https://${this.bucketPublic}.s3.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/${key}`,
+      publicUrl: `https://${this.bucketPublic}.s3.${process.env.AWS_REGION || 'us-east-2'}.amazonaws.com/${key}`,
     };
   }
 

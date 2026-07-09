@@ -6,7 +6,7 @@
 #   export TF_VAR_redis_auth_token="tu-token-redis-16chars"
 # ─────────────────────────────────────────────────────────────────────────────
 
-aws_region   = "us-east-1"
+aws_region   = "us-east-2"
 project_name = "reservas"
 environment  = "dev"
 

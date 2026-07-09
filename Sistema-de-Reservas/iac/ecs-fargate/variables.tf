@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "Región AWS"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "project_name" {
@@ -189,4 +189,22 @@ variable "sqs_pagos_notificaciones_url" {
 
 variable "sqs_reservas_pagos_url" {
   type = string
+}
+
+variable "autoscale_min_capacity" {
+  description = "Capacidad mínima de tareas para el auto-escalado"
+  type        = number
+  default     = 1
+}
+
+variable "autoscale_max_capacity" {
+  description = "Capacidad máxima de tareas para el auto-escalado"
+  type        = number
+  default     = 3
+}
+
+variable "autoscale_target_cpu" {
+  description = "Porcentaje de uso de CPU promedio objetivo para el auto-escalado"
+  type        = number
+  default     = 70
 }
