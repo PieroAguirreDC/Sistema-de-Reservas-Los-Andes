@@ -18,7 +18,6 @@ locals {
   }, var.tags)
 
   alb_suffix = replace(var.alb_arn, "/.*loadbalancer\\//", "")
-  tg_suffix  = replace(var.api_target_group_arn, "/.*:targetgroup/", "targetgroup/")
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -37,10 +36,10 @@ resource "aws_sns_topic_subscription" "email" {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ALARMAS ECS — CPU y Memoria
+# ALARMAS ECS — CPU y Memoria (Usuarios)
 # ─────────────────────────────────────────────────────────────────────────────
-resource "aws_cloudwatch_metric_alarm" "ecs_api_cpu" {
-  alarm_name          = "${local.name_prefix}-api-cpu-high"
+resource "aws_cloudwatch_metric_alarm" "ecs_usuarios_cpu" {
+  alarm_name          = "${local.name_prefix}-usuarios-cpu-high"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "CPUUtilization"
@@ -48,17 +47,17 @@ resource "aws_cloudwatch_metric_alarm" "ecs_api_cpu" {
   period              = 60
   statistic           = "Average"
   threshold           = 80
-  alarm_description   = "CPU del servicio API supera 80%"
+  alarm_description   = "CPU del servicio Usuarios supera 80%"
   alarm_actions       = [aws_sns_topic.alerts.arn]
 
   dimensions = {
     ClusterName = var.cluster_name
-    ServiceName = var.api_service_name
+    ServiceName = var.usuarios_service_name
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "ecs_api_memory" {
-  alarm_name          = "${local.name_prefix}-api-memory-high"
+resource "aws_cloudwatch_metric_alarm" "ecs_usuarios_memory" {
+  alarm_name          = "${local.name_prefix}-usuarios-memory-high"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "MemoryUtilization"
@@ -66,15 +65,174 @@ resource "aws_cloudwatch_metric_alarm" "ecs_api_memory" {
   period              = 60
   statistic           = "Average"
   threshold           = 80
-  alarm_description   = "Memoria del servicio API supera 80%"
+  alarm_description   = "Memoria del servicio Usuarios supera 80%"
   alarm_actions       = [aws_sns_topic.alerts.arn]
 
   dimensions = {
     ClusterName = var.cluster_name
-    ServiceName = var.api_service_name
+    ServiceName = var.usuarios_service_name
   }
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ALARMAS ECS — CPU y Memoria (Habitaciones)
+# ─────────────────────────────────────────────────────────────────────────────
+resource "aws_cloudwatch_metric_alarm" "ecs_habitaciones_cpu" {
+  alarm_name          = "${local.name_prefix}-habitaciones-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "CPU del servicio Habitaciones supera 80%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = var.habitaciones_service_name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_habitaciones_memory" {
+  alarm_name          = "${local.name_prefix}-habitaciones-memory-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "MemoryUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "Memoria del servicio Habitaciones supera 80%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = var.habitaciones_service_name
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ALARMAS ECS — CPU y Memoria (Reservas)
+# ─────────────────────────────────────────────────────────────────────────────
+resource "aws_cloudwatch_metric_alarm" "ecs_reservas_cpu" {
+  alarm_name          = "${local.name_prefix}-reservas-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "CPU del servicio Reservas supera 80%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = var.reservas_service_name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_reservas_memory" {
+  alarm_name          = "${local.name_prefix}-reservas-memory-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "MemoryUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "Memoria del servicio Reservas supera 80%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = var.reservas_service_name
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ALARMAS ECS — CPU y Memoria (Pagos)
+# ─────────────────────────────────────────────────────────────────────────────
+resource "aws_cloudwatch_metric_alarm" "ecs_pagos_cpu" {
+  alarm_name          = "${local.name_prefix}-pagos-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "CPU del servicio Pagos supera 80%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = var.pagos_service_name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_pagos_memory" {
+  alarm_name          = "${local.name_prefix}-pagos-memory-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "MemoryUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "Memoria del servicio Pagos supera 80%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = var.pagos_service_name
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ALARMAS ECS — CPU y Memoria (Notificaciones)
+# ─────────────────────────────────────────────────────────────────────────────
+resource "aws_cloudwatch_metric_alarm" "ecs_notificaciones_cpu" {
+  alarm_name          = "${local.name_prefix}-notificaciones-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "CPU del servicio Notificaciones supera 80%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = var.notificaciones_service_name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "ecs_notificaciones_memory" {
+  alarm_name          = "${local.name_prefix}-notificaciones-memory-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "MemoryUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "Memoria del servicio Notificaciones supera 80%"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+
+  dimensions = {
+    ClusterName = var.cluster_name
+    ServiceName = var.notificaciones_service_name
+  }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ALARMAS ECS — CPU y Memoria (Web)
+# ─────────────────────────────────────────────────────────────────────────────
 resource "aws_cloudwatch_metric_alarm" "ecs_web_cpu" {
   alarm_name          = "${local.name_prefix}-web-cpu-high"
   comparison_operator = "GreaterThanThreshold"
@@ -129,8 +287,16 @@ resource "aws_cloudwatch_dashboard" "main" {
           title  = "ECS API — CPU & Memory"
           period = 60
           metrics = [
-            ["AWS/ECS", "CPUUtilization", "ClusterName", var.cluster_name, "ServiceName", var.api_service_name],
-            ["AWS/ECS", "MemoryUtilization", "ClusterName", var.cluster_name, "ServiceName", var.api_service_name]
+            ["AWS/ECS", "CPUUtilization", "ClusterName", var.cluster_name, "ServiceName", var.usuarios_service_name],
+            ["AWS/ECS", "MemoryUtilization", "ClusterName", var.cluster_name, "ServiceName", var.usuarios_service_name],
+            ["AWS/ECS", "CPUUtilization", "ClusterName", var.cluster_name, "ServiceName", var.habitaciones_service_name],
+            ["AWS/ECS", "MemoryUtilization", "ClusterName", var.cluster_name, "ServiceName", var.habitaciones_service_name],
+            ["AWS/ECS", "CPUUtilization", "ClusterName", var.cluster_name, "ServiceName", var.reservas_service_name],
+            ["AWS/ECS", "MemoryUtilization", "ClusterName", var.cluster_name, "ServiceName", var.reservas_service_name],
+            ["AWS/ECS", "CPUUtilization", "ClusterName", var.cluster_name, "ServiceName", var.pagos_service_name],
+            ["AWS/ECS", "MemoryUtilization", "ClusterName", var.cluster_name, "ServiceName", var.pagos_service_name],
+            ["AWS/ECS", "CPUUtilization", "ClusterName", var.cluster_name, "ServiceName", var.notificaciones_service_name],
+            ["AWS/ECS", "MemoryUtilization", "ClusterName", var.cluster_name, "ServiceName", var.notificaciones_service_name]
           ]
         }
       },

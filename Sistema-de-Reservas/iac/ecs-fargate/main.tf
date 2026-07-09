@@ -36,16 +36,42 @@ resource "aws_iam_role_policy_attachment" "ecs_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_cloudwatch_log_group" "api" {
-  name              = "/ecs/${local.name_prefix}/api"
-  retention_in_days = 365             # fix CKV_AWS_338
-  kms_key_id        = var.kms_key_arn # fix CKV_AWS_158
+# ─── LOG GROUPS POR MICROSERVICIO ─────────────────────────────────────────────
+
+resource "aws_cloudwatch_log_group" "usuarios" {
+  name              = "/ecs/${local.name_prefix}/usuarios"
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
+}
+
+resource "aws_cloudwatch_log_group" "habitaciones" {
+  name              = "/ecs/${local.name_prefix}/habitaciones"
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
+}
+
+resource "aws_cloudwatch_log_group" "reservas" {
+  name              = "/ecs/${local.name_prefix}/reservas"
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
+}
+
+resource "aws_cloudwatch_log_group" "pagos" {
+  name              = "/ecs/${local.name_prefix}/pagos"
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
+}
+
+resource "aws_cloudwatch_log_group" "notificaciones" {
+  name              = "/ecs/${local.name_prefix}/notificaciones"
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
 }
 
 resource "aws_cloudwatch_log_group" "web" {
   name              = "/ecs/${local.name_prefix}/web"
-  retention_in_days = 365             # fix CKV_AWS_338
-  kms_key_id        = var.kms_key_arn # fix CKV_AWS_158
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
 }
 
 resource "aws_ecs_cluster" "main" {
@@ -123,8 +149,41 @@ resource "aws_iam_role_policy" "ecs_execution_secrets" {
   policy = data.aws_iam_policy_document.ecs_execution_secrets.json
 }
 
-resource "aws_ecs_task_definition" "api" {
-  family                   = "${local.name_prefix}-api"
+# ─────────────────────────────────────────────────────────────────────────────
+# ENVIRONMENT VARIABLES COMUNES PARA MICROSERVICIOS
+# ─────────────────────────────────────────────────────────────────────────────
+locals {
+  common_env = [
+    { name = "NODE_ENV", value = var.environment },
+    { name = "PORT", value = "3000" },
+    { name = "DB_HOST", value = var.rds_proxy_endpoint },
+    { name = "DB_PORT", value = tostring(var.aurora_port) },
+    { name = "DB_NAME", value = var.aurora_database_name },
+    { name = "DB_SSL", value = "true" },
+    { name = "REDIS_HOST", value = var.redis_primary_endpoint },
+    { name = "REDIS_PORT", value = tostring(var.redis_port) },
+    { name = "AWS_REGION", value = var.aws_region },
+    { name = "S3_BUCKET_PUBLIC", value = var.s3_bucket_public },
+    { name = "S3_BUCKET_PRIVATE", value = var.s3_bucket_private },
+    { name = "SNS_TOPIC_RESERVAS_ARN", value = var.sns_topic_reservas_arn },
+    { name = "SNS_TOPIC_PAGOS_ARN", value = var.sns_topic_pagos_arn },
+    { name = "SQS_RESERVAS_NOTIFICACIONES_URL", value = var.sqs_reservas_notificaciones_url },
+    { name = "SQS_PAGOS_NOTIFICACIONES_URL", value = var.sqs_pagos_notificaciones_url },
+    { name = "SQS_RESERVAS_PAGOS_URL", value = var.sqs_reservas_pagos_url }
+  ]
+
+  common_secrets = [
+    { name = "DB_USERNAME", valueFrom = "${var.secret_rds_arn}:username::" },
+    { name = "DB_PASSWORD", valueFrom = "${var.secret_rds_arn}:password::" }
+  ]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TASK DEFINITIONS
+# ─────────────────────────────────────────────────────────────────────────────
+
+resource "aws_ecs_task_definition" "usuarios" {
+  family                   = "${local.name_prefix}-usuarios"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.api_cpu
@@ -133,8 +192,8 @@ resource "aws_ecs_task_definition" "api" {
   task_role_arn            = aws_iam_role.ecs_task.arn
 
   container_definitions = jsonencode([{
-    name                   = "api"
-    image                  = var.api_image_uri
+    name                   = "usuarios"
+    image                  = var.usuarios_image_uri
     essential              = true
     readonlyRootFilesystem = true
     portMappings = [{
@@ -144,33 +203,147 @@ resource "aws_ecs_task_definition" "api" {
     logConfiguration = {
       logDriver = "awslogs"
       options = {
-        "awslogs-group"         = aws_cloudwatch_log_group.api.name
+        "awslogs-group"         = aws_cloudwatch_log_group.usuarios.name
         "awslogs-region"        = var.aws_region
-        "awslogs-stream-prefix" = "api"
+        "awslogs-stream-prefix" = "usuarios"
       }
     }
-    environment = [
-      { name = "NODE_ENV", value = var.environment },
-      { name = "PORT", value = "3000" },
-      { name = "DB_HOST", value = var.rds_proxy_endpoint },
-      { name = "DB_PORT", value = tostring(var.aurora_port) },
-      { name = "DB_NAME", value = var.aurora_database_name },
-      { name = "DB_SSL", value = "true" },
-      { name = "REDIS_HOST", value = var.redis_primary_endpoint },
-      { name = "REDIS_PORT", value = tostring(var.redis_port) },
-      { name = "AWS_REGION", value = var.aws_region },
-      { name = "S3_BUCKET_PUBLIC", value = var.s3_bucket_public },
-      { name = "S3_BUCKET_PRIVATE", value = var.s3_bucket_private },
-      { name = "SNS_TOPIC_RESERVAS_ARN", value = var.sns_topic_reservas_arn },
-      { name = "SNS_TOPIC_PAGOS_ARN", value = var.sns_topic_pagos_arn },
-      { name = "SQS_RESERVAS_NOTIFICACIONES_URL", value = var.sqs_reservas_notificaciones_url },
-      { name = "SQS_PAGOS_NOTIFICACIONES_URL", value = var.sqs_pagos_notificaciones_url },
-      { name = "SQS_RESERVAS_PAGOS_URL", value = var.sqs_reservas_pagos_url },
-    ]
-    secrets = [
-      { name = "DB_USERNAME", valueFrom = "${var.secret_rds_arn}:username::" },
-      { name = "DB_PASSWORD", valueFrom = "${var.secret_rds_arn}:password::" },
-    ]
+    environment = concat(local.common_env, [
+      { name = "SERVICE_NAME", value = "usuarios" }
+    ])
+    secrets = local.common_secrets
+  }])
+}
+
+resource "aws_ecs_task_definition" "habitaciones" {
+  family                   = "${local.name_prefix}-habitaciones"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.api_cpu
+  memory                   = var.api_memory
+  execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
+  container_definitions = jsonencode([{
+    name                   = "habitaciones"
+    image                  = var.habitaciones_image_uri
+    essential              = true
+    readonlyRootFilesystem = true
+    portMappings = [{
+      containerPort = 3000
+      protocol      = "tcp"
+    }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.habitaciones.name
+        "awslogs-region"        = var.aws_region
+        "awslogs-stream-prefix" = "habitaciones"
+      }
+    }
+    environment = concat(local.common_env, [
+      { name = "SERVICE_NAME", value = "habitaciones" }
+    ])
+    secrets = local.common_secrets
+  }])
+}
+
+resource "aws_ecs_task_definition" "reservas" {
+  family                   = "${local.name_prefix}-reservas"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.api_cpu
+  memory                   = var.api_memory
+  execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
+  container_definitions = jsonencode([{
+    name                   = "reservas"
+    image                  = var.reservas_image_uri
+    essential              = true
+    readonlyRootFilesystem = true
+    portMappings = [{
+      containerPort = 3000
+      protocol      = "tcp"
+    }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.reservas.name
+        "awslogs-region"        = var.aws_region
+        "awslogs-stream-prefix" = "reservas"
+      }
+    }
+    environment = concat(local.common_env, [
+      { name = "SERVICE_NAME", value = "reservas" }
+    ])
+    secrets = local.common_secrets
+  }])
+}
+
+resource "aws_ecs_task_definition" "pagos" {
+  family                   = "${local.name_prefix}-pagos"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.api_cpu
+  memory                   = var.api_memory
+  execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
+  container_definitions = jsonencode([{
+    name                   = "pagos"
+    image                  = var.pagos_image_uri
+    essential              = true
+    readonlyRootFilesystem = true
+    portMappings = [{
+      containerPort = 3000
+      protocol      = "tcp"
+    }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.pagos.name
+        "awslogs-region"        = var.aws_region
+        "awslogs-stream-prefix" = "pagos"
+      }
+    }
+    environment = concat(local.common_env, [
+      { name = "SERVICE_NAME", value = "pagos" }
+    ])
+    secrets = local.common_secrets
+  }])
+}
+
+resource "aws_ecs_task_definition" "notificaciones" {
+  family                   = "${local.name_prefix}-notificaciones"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.api_cpu
+  memory                   = var.api_memory
+  execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
+  container_definitions = jsonencode([{
+    name                   = "notificaciones"
+    image                  = var.notificaciones_image_uri
+    essential              = true
+    readonlyRootFilesystem = true
+    portMappings = [{
+      containerPort = 3000
+      protocol      = "tcp"
+    }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.notificaciones.name
+        "awslogs-region"        = var.aws_region
+        "awslogs-stream-prefix" = "notificaciones"
+      }
+    }
+    environment = concat(local.common_env, [
+      { name = "SERVICE_NAME", value = "notificaciones" }
+    ])
+    secrets = local.common_secrets
   }])
 }
 
@@ -206,10 +379,14 @@ resource "aws_ecs_task_definition" "web" {
   }])
 }
 
-resource "aws_ecs_service" "api" {
-  name            = "${local.name_prefix}-api-svc"
+# ─────────────────────────────────────────────────────────────────────────────
+# ECS SERVICES
+# ─────────────────────────────────────────────────────────────────────────────
+
+resource "aws_ecs_service" "usuarios" {
+  name            = "${local.name_prefix}-usuarios-svc"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.api.arn
+  task_definition = aws_ecs_task_definition.usuarios.arn
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
 
@@ -220,8 +397,8 @@ resource "aws_ecs_service" "api" {
   }
 
   load_balancer {
-    target_group_arn = var.api_target_group_arn
-    container_name   = "api"
+    target_group_arn = var.usuarios_target_group_arn
+    container_name   = "usuarios"
     container_port   = 3000
   }
 
@@ -234,6 +411,123 @@ resource "aws_ecs_service" "api" {
     ignore_changes = [task_definition, desired_count]
   }
 }
+
+resource "aws_ecs_service" "habitaciones" {
+  name            = "${local.name_prefix}-habitaciones-svc"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.habitaciones.arn
+  desired_count   = var.desired_count
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = var.private_subnet_ids
+    security_groups  = [var.sg_ecs_id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = var.habitaciones_target_group_arn
+    container_name   = "habitaciones"
+    container_port   = 3000
+  }
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition, desired_count]
+  }
+}
+
+resource "aws_ecs_service" "reservas" {
+  name            = "${local.name_prefix}-reservas-svc"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.reservas.arn
+  desired_count   = var.desired_count
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = var.private_subnet_ids
+    security_groups  = [var.sg_ecs_id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = var.reservas_target_group_arn
+    container_name   = "reservas"
+    container_port   = 3000
+  }
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition, desired_count]
+  }
+}
+
+resource "aws_ecs_service" "pagos" {
+  name            = "${local.name_prefix}-pagos-svc"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.pagos.arn
+  desired_count   = var.desired_count
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = var.private_subnet_ids
+    security_groups  = [var.sg_ecs_id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = var.pagos_target_group_arn
+    container_name   = "pagos"
+    container_port   = 3000
+  }
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition, desired_count]
+  }
+}
+
+resource "aws_ecs_service" "notificaciones" {
+  name            = "${local.name_prefix}-notificaciones-svc"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.notificaciones.arn
+  desired_count   = var.desired_count
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = var.private_subnet_ids
+    security_groups  = [var.sg_ecs_id]
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = var.notificaciones_target_group_arn
+    container_name   = "notificaciones"
+    container_port   = 3000
+  }
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition, desired_count]
+  }
+}
+
 resource "aws_ecs_service" "web" {
   name            = "${local.name_prefix}-web-svc"
   cluster         = aws_ecs_cluster.main.id

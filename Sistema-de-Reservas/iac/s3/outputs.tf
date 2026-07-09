@@ -44,3 +44,8 @@ output "max_pdf_size_bytes" {
   description = "Consumido por: apps/api al configurar content-length-range en los presigned POST de PDFs"
   value       = var.max_pdf_size_mb * 1024 * 1024
 }
+
+output "frontend_static_bucket_regional_domain_name" {
+  description = "Nombre de dominio regional del bucket S3 de frontend estático"
+  value       = aws_s3_bucket.frontend_static.bucket_regional_domain_name
+}

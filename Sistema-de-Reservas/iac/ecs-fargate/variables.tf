@@ -27,8 +27,28 @@ variable "sg_ecs_id" {
   type        = string
 }
 
-variable "api_target_group_arn" {
-  description = "ARN del TG de la API — viene del módulo alb"
+variable "usuarios_target_group_arn" {
+  description = "ARN del TG de la API de Usuarios"
+  type        = string
+}
+
+variable "habitaciones_target_group_arn" {
+  description = "ARN del TG de la API de Habitaciones"
+  type        = string
+}
+
+variable "reservas_target_group_arn" {
+  description = "ARN del TG de la API de Reservas"
+  type        = string
+}
+
+variable "pagos_target_group_arn" {
+  description = "ARN del TG de la API de Pagos"
+  type        = string
+}
+
+variable "notificaciones_target_group_arn" {
+  description = "ARN del TG de la API de Notificaciones"
   type        = string
 }
 
@@ -37,8 +57,28 @@ variable "web_target_group_arn" {
   type        = string
 }
 
-variable "api_image_uri" {
-  description = "URI completa de la imagen en ECR para la API"
+variable "usuarios_image_uri" {
+  description = "URI de la imagen de ECR de Usuarios"
+  type        = string
+}
+
+variable "habitaciones_image_uri" {
+  description = "URI de la imagen de ECR de Habitaciones"
+  type        = string
+}
+
+variable "reservas_image_uri" {
+  description = "URI de la imagen de ECR de Reservas"
+  type        = string
+}
+
+variable "pagos_image_uri" {
+  description = "URI de la imagen de ECR de Pagos"
+  type        = string
+}
+
+variable "notificaciones_image_uri" {
+  description = "URI de la imagen de ECR de Notificaciones"
   type        = string
 }
 
