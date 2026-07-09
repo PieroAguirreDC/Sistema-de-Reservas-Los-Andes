@@ -100,8 +100,7 @@ jobs:
             DB_HOST=${{ vars.RDS_PROXY_ENDPOINT }}
             DB_PORT=5432
             DB_NAME=${{ vars.AURORA_DB_NAME }}
-            DB_USERNAME=${{ vars.AURORA_USERNAME }}
-            DB_PASSWORD=${{ secrets.DB_MASTER_PASSWORD }}
+            DB_SSL=true
             REDIS_HOST=${{ vars.REDIS_PRIMARY_ENDPOINT }}
             REDIS_PORT=6379
             REDIS_AUTH_TOKEN=${{ secrets.REDIS_AUTH_TOKEN }}
