@@ -108,8 +108,8 @@ resource "aws_lb" "main" {
 # ─────────────────────────────────────────────────────────────────────────────
 # TARGET GROUP — Apunta a los contenedores ECS Fargate
 # ─────────────────────────────────────────────────────────────────────────────
-resource "aws_lb_target_group" "api" {
-  name        = "${local.name_prefix}-api-tg"
+resource "aws_lb_target_group" "usuarios" {
+  name        = "${local.name_prefix}-usuarios-tg"
   port        = 3000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -126,9 +126,91 @@ resource "aws_lb_target_group" "api" {
     matcher             = "200"
   }
 
-  tags = {
-    Name = "${local.name_prefix}-api-tg"
+  tags = merge(local.base_tags, { Name = "${local.name_prefix}-usuarios-tg" })
+}
+
+resource "aws_lb_target_group" "habitaciones" {
+  name        = "${local.name_prefix}-habitaciones-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    path                = "/api/v1/health"
+    protocol            = "HTTP"
+    matcher             = "200"
   }
+
+  tags = merge(local.base_tags, { Name = "${local.name_prefix}-habitaciones-tg" })
+}
+
+resource "aws_lb_target_group" "reservas" {
+  name        = "${local.name_prefix}-reservas-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    path                = "/api/v1/health"
+    protocol            = "HTTP"
+    matcher             = "200"
+  }
+
+  tags = merge(local.base_tags, { Name = "${local.name_prefix}-reservas-tg" })
+}
+
+resource "aws_lb_target_group" "pagos" {
+  name        = "${local.name_prefix}-pagos-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    path                = "/api/v1/health"
+    protocol            = "HTTP"
+    matcher             = "200"
+  }
+
+  tags = merge(local.base_tags, { Name = "${local.name_prefix}-pagos-tg" })
+}
+
+resource "aws_lb_target_group" "notificaciones" {
+  name        = "${local.name_prefix}-notificaciones-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    path                = "/api/v1/health"
+    protocol            = "HTTP"
+    matcher             = "200"
+  }
+
+  tags = merge(local.base_tags, { Name = "${local.name_prefix}-notificaciones-tg" })
 }
 
 resource "aws_lb_target_group" "web" {
@@ -171,13 +253,93 @@ resource "aws_lb_listener" "http" {
 # ─────────────────────────────────────────────────────────────────────────────
 # LISTENER RULE — /api/v1/* va al target group de la API
 # ─────────────────────────────────────────────────────────────────────────────
-resource "aws_lb_listener_rule" "api" {
+resource "aws_lb_listener_rule" "usuarios" {
   listener_arn = aws_lb_listener.http.arn
-  priority     = 100
+  priority     = 101
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.api.arn
+    target_group_arn = aws_lb_target_group.usuarios.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/usuarios*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "habitaciones" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 102
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.habitaciones.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/habitaciones*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "reservas" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 103
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.reservas.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/reservas*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "pagos" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 104
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.pagos.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/pagos*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "notificaciones" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 105
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.notificaciones.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/v1/notificaciones*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "api_fallback" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.usuarios.arn
   }
 
   condition {

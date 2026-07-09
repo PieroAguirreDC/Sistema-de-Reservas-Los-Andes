@@ -254,6 +254,36 @@ resource "aws_vpc_endpoint" "ssm" {
   }
 }
 
+resource "aws_vpc_endpoint" "sqs" {
+  count = var.enable_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${var.aws_region}.sqs"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+  subnet_ids          = aws_subnet.private_app[*].id
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+
+  tags = {
+    Name = "${local.name_prefix}-endpoint-sqs"
+  }
+}
+
+resource "aws_vpc_endpoint" "sns" {
+  count = var.enable_vpc_endpoints ? 1 : 0
+
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.${var.aws_region}.sns"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+  subnet_ids          = aws_subnet.private_app[*].id
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+
+  tags = {
+    Name = "${local.name_prefix}-endpoint-sns"
+  }
+}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # CKV2_AWS_11: VPC FLOW LOGS — trazabilidad de tráfico de red
 # ─────────────────────────────────────────────────────────────────────────────

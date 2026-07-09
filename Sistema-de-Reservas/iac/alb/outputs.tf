@@ -13,9 +13,29 @@ output "alb_zone_id" {
   value       = aws_lb.main.zone_id
 }
 
-output "api_target_group_arn" {
-  description = "ARN del target group API — consumido por: ecs-fargate"
-  value       = aws_lb_target_group.api.arn
+output "usuarios_target_group_arn" {
+  description = "ARN del target group Usuarios — consumido por: ecs-fargate"
+  value       = aws_lb_target_group.usuarios.arn
+}
+
+output "habitaciones_target_group_arn" {
+  description = "ARN del target group Habitaciones — consumido por: ecs-fargate"
+  value       = aws_lb_target_group.habitaciones.arn
+}
+
+output "reservas_target_group_arn" {
+  description = "ARN del target group Reservas — consumido por: ecs-fargate"
+  value       = aws_lb_target_group.reservas.arn
+}
+
+output "pagos_target_group_arn" {
+  description = "ARN del target group Pagos — consumido por: ecs-fargate"
+  value       = aws_lb_target_group.pagos.arn
+}
+
+output "notificaciones_target_group_arn" {
+  description = "ARN del target group Notificaciones — consumido por: ecs-fargate"
+  value       = aws_lb_target_group.notificaciones.arn
 }
 
 output "web_target_group_arn" {

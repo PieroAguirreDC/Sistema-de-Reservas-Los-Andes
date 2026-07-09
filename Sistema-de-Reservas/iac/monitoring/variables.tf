@@ -18,8 +18,28 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "api_service_name" {
-  description = "Nombre del servicio API — viene del módulo ecs-fargate"
+variable "usuarios_service_name" {
+  description = "Nombre del servicio ECS de Usuarios"
+  type        = string
+}
+
+variable "habitaciones_service_name" {
+  description = "Nombre del servicio ECS de Habitaciones"
+  type        = string
+}
+
+variable "reservas_service_name" {
+  description = "Nombre del servicio ECS de Reservas"
+  type        = string
+}
+
+variable "pagos_service_name" {
+  description = "Nombre del servicio ECS de Pagos"
+  type        = string
+}
+
+variable "notificaciones_service_name" {
+  description = "Nombre del servicio ECS de Notificaciones"
   type        = string
 }
 
@@ -33,8 +53,8 @@ variable "alb_arn" {
   type        = string
 }
 
-variable "api_target_group_arn" {
-  description = "ARN del TG API — viene del módulo alb"
+variable "usuarios_target_group_arn" {
+  description = "ARN del TG de la API de Usuarios — viene del módulo alb"
   type        = string
 }
 

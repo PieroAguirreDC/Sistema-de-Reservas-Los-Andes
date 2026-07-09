@@ -8,9 +8,29 @@ output "cluster_name" {
   value       = aws_ecs_cluster.main.name
 }
 
-output "api_service_name" {
-  description = "Nombre del servicio API — consumido por: ci/cd"
-  value       = aws_ecs_service.api.name
+output "usuarios_service_name" {
+  description = "Nombre del servicio ECS de Usuarios"
+  value       = aws_ecs_service.usuarios.name
+}
+
+output "habitaciones_service_name" {
+  description = "Nombre del servicio ECS de Habitaciones"
+  value       = aws_ecs_service.habitaciones.name
+}
+
+output "reservas_service_name" {
+  description = "Nombre del servicio ECS de Reservas"
+  value       = aws_ecs_service.reservas.name
+}
+
+output "pagos_service_name" {
+  description = "Nombre del servicio ECS de Pagos"
+  value       = aws_ecs_service.pagos.name
+}
+
+output "notificaciones_service_name" {
+  description = "Nombre del servicio ECS de Notificaciones"
+  value       = aws_ecs_service.notificaciones.name
 }
 
 output "web_service_name" {
