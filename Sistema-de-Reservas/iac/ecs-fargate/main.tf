@@ -635,4 +635,5 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
     scale_in_cooldown  = 300
     scale_out_cooldown = 60
   }
-}
+}#   T r i g g e r   c h e c k o v  
+ 
