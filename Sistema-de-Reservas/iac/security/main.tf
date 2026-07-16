@@ -111,7 +111,6 @@ resource "aws_secretsmanager_secret_version" "rds_credentials" {
 # ALB (recibe tráfico HTTPS desde internet)
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_security_group" "alb" {
-  #checkov:skip=CKV2_AWS_5:SG adjunto al ALB definido en el modulo alb
   name        = "${local.name_prefix}-sg-alb"
   description = "SG del Application Load Balancer - permite HTTPS desde internet"
   vpc_id      = var.vpc_id
@@ -120,6 +119,14 @@ resource "aws_security_group" "alb" {
     description = "HTTPS desde internet"
     from_port   = 443
     to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTP desde internet"
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
