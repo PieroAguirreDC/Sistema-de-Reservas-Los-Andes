@@ -44,6 +44,7 @@ export class ReservasService {
   }
 
   async create(dto: CreateReservaDto): Promise<Reserva> {
+    let precio_por_noche: number;
     // Check availability synchronously via HTTP
     try {
       const response = await fetch(`${this.habitacionesUrl}/${dto.habitacion_id}`);
@@ -55,6 +56,7 @@ export class ReservasService {
       if (!habitacion.disponible) {
         throw new BadRequestException('La habitación no está disponible');
       }
+      precio_por_noche = habitacion.precio_por_noche;
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
@@ -74,6 +76,9 @@ export class ReservasService {
         habitacion_id: saved.habitacion_id,
         usuario_id: saved.usuario_id,
         estado: saved.estado,
+        fecha_inicio: saved.fecha_inicio,
+        fecha_fin: saved.fecha_fin,
+        precio_por_noche,
       });
     }
 
