@@ -24,16 +24,39 @@ jobs:
 
       - name: Ejecutar Checkov
         id: checkov
+        continue-on-error: true
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: Sistema-de-Reservas/iac
           framework: terraform
-          soft_fail: true
+          soft_fail: false
           output_format: cli,sarif
-          output_file_path: console,checkov-results.sarif
+          output_file_path: checkov_results.txt,checkov-results.sarif
 
       - name: Subir resultados SARIF a GitHub Security
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: checkov-results.sarif
+
+      - name: Enviar reporte de Checkov por correo
+        if: steps.checkov.outcome == 'failure'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "⚠️ Alerta de Seguridad: Falló el análisis de Checkov"
+          to: rodrigo.baldeonj@gmail.com
+          from: "GitHub Actions <${{ secrets.EMAIL_USERNAME }}>"
+          body: |
+            Se han detectado fallas de seguridad en el repositorio Sistema de Reservas Los Andes.
+
+            Repositorio: ${{ github.repository }}
+            Rama: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+
+            Se adjunta el reporte completo de Checkov (checkov_results.txt).
+            También puedes ver el detalle navegable en la pestaña Security del repositorio.
+          attachments: checkov_results.txt
