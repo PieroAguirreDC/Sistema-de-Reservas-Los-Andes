@@ -6,6 +6,15 @@ import { CreateHabitacionDto } from './dto/create-habitacion.dto';
 export class HabitacionesController {
   constructor(private readonly habitacionesService: HabitacionesService) {}
 
+  @Get('error-test')
+  errorTest() {
+    import('@nestjs/common').then(({ Logger, InternalServerErrorException }) => {
+      const logger = new Logger('TestAlarma');
+      logger.error('ERROR DE PRUEBA: Forzando alarma de CloudWatch en ms-habitaciones');
+    });
+    throw new Error('Endpoint de prueba para disparar la alarma');
+  }
+
   @Get()
   findAll() {
     return this.habitacionesService.findAll();
