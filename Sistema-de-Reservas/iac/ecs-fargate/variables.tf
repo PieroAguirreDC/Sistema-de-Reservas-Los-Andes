@@ -191,6 +191,18 @@ variable "sqs_reservas_pagos_url" {
   type = string
 }
 
+variable "sqs_reservas_habitaciones_url" {
+  type = string
+}
+
+variable "cognito_user_pool_id" {
+  type = string
+}
+
+variable "cognito_client_id" {
+  type = string
+}
+
 variable "autoscale_min_capacity" {
   description = "Capacidad mínima de tareas para el auto-escalado"
   type        = number

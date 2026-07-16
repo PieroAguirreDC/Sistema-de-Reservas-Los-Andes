@@ -1,4 +1,4 @@
-name: Deploy API dev
+name: Deploy API dev (microservicios)
 
 on:
   push:
@@ -16,17 +16,33 @@ permissions:
 env:
   AWS_REGION: us-east-2
 
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY_API }}
-  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ vars.ECS_SERVICE_API }}
-  TASK_FAMILY: ${{ vars.TASK_FAMILY_API }}
-
 jobs:
 
   deploy:
-    name: Analizar & Desplegar API
+    name: Desplegar ${{ matrix.service }}
     runs-on: ubuntu-latest
     environment: dev
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [usuarios, habitaciones, reservas, pagos, notificaciones]
+        include:
+          - service: usuarios
+            ecr_repo: api-usuarios
+            container_name: usuarios
+          - service: habitaciones
+            ecr_repo: api-habitaciones
+            container_name: habitaciones
+          - service: reservas
+            ecr_repo: api-reservas
+            container_name: reservas
+          - service: pagos
+            ecr_repo: api-pagos
+            container_name: pagos
+          - service: notificaciones
+            ecr_repo: api-notificaciones
+            container_name: notificaciones
 
     steps:
       - name: checkout del código
@@ -61,30 +77,30 @@ jobs:
 
       - name: verificar o crear repositorio ecr
         run: |
-          aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} \
+          aws ecr describe-repositories --repository-names ${{ matrix.ecr_repo }} \
             --region ${{ env.AWS_REGION }} 2>/dev/null || \
-          aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY }} \
+          aws ecr create-repository --repository-name ${{ matrix.ecr_repo }} \
             --region ${{ env.AWS_REGION }} \
             --image-scanning-configuration scanOnPush=true \
             --encryption-configuration encryptionType=AES256
 
-      - name: construir, etiquetar y pushear imagen de la api a ecr
+      - name: construir, etiquetar y pushear imagen a ecr
         id: build-imagen
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/${{ matrix.ecr_repo }}:$IMAGE_TAG \
             -f Sistema-de-Reservas/app/api/Dockerfile \
             Sistema-de-Reservas/app/api/
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker push $ECR_REGISTRY/${{ matrix.ecr_repo }}:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/${{ matrix.ecr_repo }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: descargar la definicion de tarea actual desde ecs
         run: |
           aws ecs describe-task-definition \
-            --task-definition ${{ env.TASK_FAMILY }} \
+            --task-definition ${{ vars.ECS_CLUSTER }}-${{ matrix.service }} \
             --query taskDefinition > task-definition.json
 
       - name: inyectar la nueva imagen y variables de entorno en la definicion
@@ -92,7 +108,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: api
+          container-name: ${{ matrix.container_name }}
           image: ${{ steps.build-imagen.outputs.image }}
           environment-variables: |
             NODE_ENV=production
@@ -105,11 +121,12 @@ jobs:
             REDIS_PORT=6379
             REDIS_AUTH_TOKEN=${{ secrets.REDIS_AUTH_TOKEN }}
             SECRET_ARN=${{ vars.SECRET_RDS_ARN }}
+            SERVICE_NAME=${{ matrix.service }}
 
-      - name: desplegar nueva version de la api en aws ecs
+      - name: desplegar nueva version en aws ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          cluster: ${{ env.ECS_CLUSTER }}
-          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ vars.ECS_CLUSTER }}
+          service: ${{ vars.ECS_CLUSTER }}-${{ matrix.service }}-svc
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           wait-for-service-stability: true

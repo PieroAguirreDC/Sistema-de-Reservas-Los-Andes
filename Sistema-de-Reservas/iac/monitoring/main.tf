@@ -283,7 +283,7 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric"
         properties = {
-          region = "us-east-2"
+          region = var.aws_region
           title  = "ECS microservicios — CPU & Memory"
           period = 60
           metrics = [
@@ -303,6 +303,7 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric"
         properties = {
+          region = var.aws_region
           title  = "ALB — Requests & Errors"
           period = 60
           metrics = [
@@ -313,4 +314,44 @@ resource "aws_cloudwatch_dashboard" "main" {
       }
     ]
   })
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LOG METRIC FILTERS + ALARMAS DE ERRORES DE APLICACIÓN
+# Detectan ERROR, Exception, "Unhandled" en los logs de cada microservicio
+# y disparan alarmas al SNS topic existente.
+# ─────────────────────────────────────────────────────────────────────────────
+
+locals {
+  microservices = ["usuarios", "habitaciones", "reservas", "pagos", "notificaciones"]
+}
+
+resource "aws_cloudwatch_log_metric_filter" "app_errors" {
+  for_each = toset(local.microservices)
+
+  name           = "${local.name_prefix}-${each.key}-error-filter"
+  log_group_name = "/ecs/${var.ecs_cluster_prefix}/${each.key}"
+  pattern        = "?ERROR ?Exception ?\"Unhandled\""
+
+  metric_transformation {
+    name      = "${local.name_prefix}-${each.key}-errors"
+    namespace = "Reservas/App"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "app_errors" {
+  for_each = toset(local.microservices)
+
+  alarm_name          = "${local.name_prefix}-${each.key}-app-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = aws_cloudwatch_log_metric_filter.app_errors[each.key].metric_transformation[0].name
+  namespace           = "Reservas/App"
+  period              = 60
+  statistic           = "Sum"
+  threshold           = 0
+  alarm_description   = "Errores de aplicación detectados en logs de ${each.key}"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  treat_missing_data  = "notBreaching"
 }

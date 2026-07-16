@@ -80,9 +80,13 @@ resource "aws_kms_alias" "main" {
 # ─────────────────────────────────────────────────────────────────────────────
 # SECRETS MANAGER — Secreto base para credenciales de RDS
 # ─────────────────────────────────────────────────────────────────────────────
+resource "random_id" "secret_suffix" {
+  byte_length = 4
+}
+
 resource "aws_secretsmanager_secret" "rds_credentials" {
   #checkov:skip=CKV2_AWS_57:Se usa un secreto bootstrap para la base de datos; la rotación automática se habilitará en una fase posterior.
-  name                    = "${local.name_prefix}/rds/credentials"
+  name                    = "${local.name_prefix}/rds/credentials-${random_id.secret_suffix.hex}"
   description             = "Credenciales de Aurora PostgreSQL para ${local.name_prefix}"
   kms_key_id              = aws_kms_key.main.arn
   recovery_window_in_days = 7

@@ -65,9 +65,9 @@ output "api_gateway_endpoint" {
   value = module.api_gateway.api_endpoint
 }
 
-output "cloudfront_domain_name" {
-  value = module.cloudfront.cloudfront_domain_name
-}
+# output "cloudfront_domain_name" {
+#   value = module.cloudfront.cloudfront_domain_name
+# }
 
 # ─── COGNITO ──────────────────────────────────────────────────────────────────
 output "cognito_user_pool_id" {
@@ -83,13 +83,13 @@ output "cognito_user_pool_domain" {
 }
 
 # ─── ROUTE 53 ─────────────────────────────────────────────────────────────────
-output "route53_zone_id" {
-  value = module.route53.zone_id
-}
+# output "route53_zone_id" {
+#   value = module.route53.zone_id
+# }
 
-output "route53_name_servers" {
-  value = module.route53.name_servers
-}
+# output "route53_name_servers" {
+#   value = module.route53.name_servers
+# }
 
 # ─── OBSERVABILIDAD ───────────────────────────────────────────────────────────
 output "cloudwatch_dashboard_name" {

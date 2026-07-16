@@ -57,11 +57,11 @@ Sistema-de-Reservas/
 | Capa | Tecnología |
 |---|---|
 | IaC | Terraform >= 1.6.0 |
-| Cloud | AWS (VPC, ECS Fargate, RDS Aurora, ElastiCache Redis, SQS/SNS, API Gateway, ALB) |
+| Cloud | AWS (VPC, ECS Fargate, RDS PostgreSQL, ElastiCache Redis, SQS/SNS, API Gateway, ALB) |
 | API | NestJS 11 + TypeORM + PostgreSQL |
 | Frontend | Next.js + TypeScript + Tailwind CSS |
 | Contenedores | Docker + ECR |
-| Base de datos | Aurora PostgreSQL 15 |
+| Base de datos | RDS PostgreSQL 15 (instancia única, Free Tier) |
 | Caché | Redis 7 (ElastiCache) |
 | Mensajería | SQS + SNS |
 
@@ -76,7 +76,7 @@ Red principal del proyecto. Define subnets públicas, privadas de app y privadas
 Security Groups, KMS y Secrets Manager para cifrado y gestión de credenciales.
 
 ### RDS
-Aurora PostgreSQL Multi-AZ con instancia primary (escritura) y standby (lectura), RDS Proxy para pool de conexiones y AWS Backup.
+RDS PostgreSQL 15 de instancia única (Free Tier: db.t3.micro). No se usa Aurora por restricciones de cuenta Free Tier (FreeTierRestrictionError). Multi-AZ deshabilitado por la misma razón. RDS Proxy está provisionado en el código Terraform pero comentado/deshabilitado (no disponible en Free Tier). AWS Backup con retención de 7 días para cumplir RNF 4.
 
 ### ElastiCache
 Redis 7 con replication group (primary + 1 replica) para failover automático sin duplicar costos.
@@ -91,7 +91,7 @@ Application Load Balancer que distribuye tráfico hacia los servicios ECS Fargat
 Cómputo serverless para los contenedores Docker de la API y el frontend.
 
 ### API Gateway
-Exposición de servicios al exterior.
+HTTP API Gateway v2 como capa opcional frente al ALB. Configurado con `authorization_type = "NONE"` para permitir acceso desde el frontend. No es crítico para el funcionamiento — el ALB ya maneja el ruteo por path.
 
 ### Monitoring
 CloudWatch con alarmas y logs para observabilidad.
@@ -262,4 +262,23 @@ docker-compose up
 - `synchronize: true` en TypeORM solo debe usarse en desarrollo, nunca en producción.
 - Los archivos `dist/`, `node_modules/` y `.env` no se suben al repositorio (ver `.gitignore`).
 - Los archivos `test.tfvars` y `.terraform/` no se suben al repositorio.
+
+---
+
+## Acceso a la Base de Datos (para demo/sustentación)
+
+La RDS no tiene IP pública (cumple RNF 2). Para conectar desde DBeaver/pgAdmin:
+
+```bash
+# Port forwarding vía SSM Session Manager (requiere AWS CLI + plugin de Session Manager)
+aws ssm start-session \
+  --target <ecs-task-id> \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters '{"host":["<rds-endpoint>"],"portNumber":["5432"],"localPortNumber":["5432"]}' \
+  --region us-east-2
+
+# Luego conectar a localhost:5432 con las credenciales de Secrets Manager
+```
+
+> **Nota:** Reemplazar `<ecs-task-id>` con el ID de una tarea ECS en ejecución y `<rds-endpoint>` con el endpoint de la instancia RDS.
 

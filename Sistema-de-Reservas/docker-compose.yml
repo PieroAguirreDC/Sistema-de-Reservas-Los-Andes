@@ -1,5 +1,22 @@
 version: '3.8'
 
+x-api-common: &api-common
+  environment:
+    DB_HOST: postgres
+    DB_PORT: 5432
+    DB_USERNAME: postgres
+    DB_PASSWORD: postgres
+    DB_NAME: reservas_db
+    NODE_ENV: development
+    # Credenciales falsas para local
+    AWS_ACCESS_KEY_ID: test
+    AWS_SECRET_ACCESS_KEY: test
+    AWS_REGION: us-east-2
+    # URLs de microservicios para local
+    MS_HABITACIONES_URL: http://ms-habitaciones:3000/api/v1/habitaciones
+  depends_on:
+    - postgres
+
 services:
   postgres:
     image: postgres:15-alpine
@@ -13,41 +30,75 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  api:
+  redis:
+    image: redis:7-alpine
+    container_name: reservas-redis
+    ports:
+      - "6379:6379"
+
+  ms-usuarios:
+    <<: *api-common
     build:
-      context: ./app/api
+      context: ./app
+      dockerfile: ms-usuarios/Dockerfile
+    container_name: ms-usuarios
+    ports:
+      - "3001:3000"
+
+  ms-habitaciones:
+    <<: *api-common
+    build:
+      context: ./app
+      dockerfile: ms-habitaciones/Dockerfile
+    container_name: ms-habitaciones
+    ports:
+      - "3002:3000"
+
+  ms-reservas:
+    <<: *api-common
+    build:
+      context: ./app
+      dockerfile: ms-reservas/Dockerfile
+    container_name: ms-reservas
+    ports:
+      - "3003:3000"
+
+  ms-pagos:
+    <<: *api-common
+    build:
+      context: ./app
+      dockerfile: ms-pagos/Dockerfile
+    container_name: ms-pagos
+    ports:
+      - "3004:3000"
+
+  ms-notificaciones:
+    <<: *api-common
+    build:
+      context: ./app
+      dockerfile: ms-notificaciones/Dockerfile
+    container_name: ms-notificaciones
+    ports:
+      - "3005:3000"
+
+  web:
+    build:
+      context: ./app/web
       dockerfile: Dockerfile.dev
-    container_name: reservas-api
+    container_name: reservas-web
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: reservas_db
-      NODE_ENV: development
-      PORT: 3000
+      # En local, Next.js llama directo al host (ej: puerto 3001 para ms-usuarios).
+      # Esto requiere un API Gateway local o que el frontend sepa a qué puerto llamar.
+      # Para simplificar, apuntamos la genérica a ms-usuarios (auth) y ajustaremos config de next.
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
     ports:
       - "3000:3000"
     volumes:
-      - ./app/api:/app
+      - ./app/web:/app
       - /app/node_modules
+      - /app/.next
     depends_on:
-      - postgres
+      - ms-usuarios
 
-  web:
-      build:
-        context: ./app/web
-        dockerfile: Dockerfile.dev
-      container_name: reservas-web
-      environment:
-        NEXT_PUBLIC_API_URL: http://localhost:3000
-      ports:
-        - "3001:3000"
-      volumes:
-        - ./app/web:/app
-        - /app/node_modules
-        - /app/.next
-      depends_on:
-        - api
 volumes:
   postgres_data:

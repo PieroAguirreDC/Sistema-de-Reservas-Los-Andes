@@ -103,7 +103,7 @@ module "rds" {
   aurora_instance_class     = "db.t3.medium" # dev: barato. prod usará db.r6g.large
   aurora_engine_version     = "15.8"
   aurora_database_name      = "reservas_db"
-  backup_retention_days     = 1
+  backup_retention_days     = 7
   aws_backup_retention_days = 7
 
   tags = var.tags
@@ -230,16 +230,29 @@ module "ecs_fargate" {
   s3_bucket_private     = module.s3.uploads_private_bucket_name
   s3_uploads_policy_arn = module.s3.backend_uploads_policy_arn
 
-  # Mensajería
-  sns_topic_reservas_arn          = module.messaging.sns_topic_reservas_arn
-  sns_topic_pagos_arn             = module.messaging.sns_topic_pagos_arn
+
+  sns_topic_reservas_arn        = module.messaging.sns_topic_reservas_arn
+  sns_topic_pagos_arn           = module.messaging.sns_topic_pagos_arn
   sqs_reservas_notificaciones_arn = module.messaging.sqs_reservas_notificaciones_arn
-  sqs_pagos_notificaciones_arn    = module.messaging.sqs_pagos_notificaciones_arn
-  sqs_reservas_pagos_arn          = module.messaging.sqs_reservas_pagos_arn
+  sqs_pagos_notificaciones_arn  = module.messaging.sqs_pagos_notificaciones_arn
+  sqs_reservas_pagos_arn        = module.messaging.sqs_reservas_pagos_arn
   sqs_reservas_notificaciones_url = module.messaging.sqs_reservas_notificaciones_url
-  sqs_pagos_notificaciones_url    = module.messaging.sqs_pagos_notificaciones_url
-  sqs_reservas_pagos_url          = module.messaging.sqs_reservas_pagos_url
-  # Auto Scaling
+  sqs_pagos_notificaciones_url  = module.messaging.sqs_pagos_notificaciones_url
+  sqs_reservas_pagos_url        = module.messaging.sqs_reservas_pagos_url
+  sqs_reservas_habitaciones_url = module.messaging.sqs_reservas_habitaciones_url
+  cognito_user_pool_id          = module.cognito.user_pool_id
+  cognito_client_id             = module.cognito.user_pool_client_id
+
+  depends_on = [
+    module.vpc,
+    module.security,
+    module.rds,
+    module.elasticache,
+    module.messaging,
+    module.cognito,
+    module.alb
+  ]
+
   autoscale_min_capacity          = 1 
   autoscale_max_capacity          = 3
   autoscale_target_cpu            = 70
@@ -259,17 +272,17 @@ module "api_gateway" {
 }
 
 # ─── CLOUDFRONT (CDN) ───────────────────────────────────────────────────────────
-module "cloudfront" {
-  source = "../../cloudfront"
-
-  project_name                = var.project_name
-  environment                 = var.environment
-  frontend_bucket_id          = module.s3.frontend_static_bucket_name
-  frontend_bucket_arn         = module.s3.frontend_static_bucket_arn
-  frontend_bucket_domain_name = module.s3.frontend_static_bucket_regional_domain_name
-  api_gateway_domain_name     = replace(module.api_gateway.api_endpoint, "/^https?:\\/\\/([^\\/]+).*/", "$1")
-  tags                        = var.tags
-}
+# module "cloudfront" {
+#   source = "../../cloudfront"
+# 
+#   project_name                = var.project_name
+#   environment                 = var.environment
+#   frontend_bucket_id          = module.s3.frontend_static_bucket_name
+#   frontend_bucket_arn         = module.s3.frontend_static_bucket_arn
+#   frontend_bucket_domain_name = module.s3.frontend_static_bucket_regional_domain_name
+#   api_gateway_domain_name     = replace(module.api_gateway.api_endpoint, "/^https?:\\/\\/([^\\/]+).*/", "$1")
+#   tags                        = var.tags
+# }
 
 # ─── COGNITO ──────────────────────────────────────────────────────────────────
 module "cognito" {
@@ -281,15 +294,15 @@ module "cognito" {
 }
 
 # ─── ROUTE 53 ─────────────────────────────────────────────────────────────────
-module "route53" {
-  source = "../../route53"
-
-  project_name           = var.project_name
-  environment            = var.environment
-  domain_name            = "reservas-${var.environment}.local"
-  cloudfront_domain_name = module.cloudfront.cloudfront_domain_name
-  tags                   = var.tags
-}
+# module "route53" {
+#   source = "../../route53"
+# 
+#   project_name           = var.project_name
+#   environment            = var.environment
+#   domain_name            = "reservas-${var.environment}.local"
+#   cloudfront_domain_name = module.cloudfront.cloudfront_domain_name
+#   tags                   = var.tags
+# }
 
 # ─── MONITORING (CloudWatch) ────────────────────────────────────────────────────
 module "monitoring" {
@@ -309,5 +322,8 @@ module "monitoring" {
   usuarios_target_group_arn   = module.alb.usuarios_target_group_arn
   kms_key_arn                 = module.security.kms_key_arn
   alarm_email                 = var.alarm_email
+  ecs_cluster_prefix          = "${var.project_name}-${var.environment}"
+
+  depends_on = [module.ecs_fargate]
   tags                        = var.tags
 }

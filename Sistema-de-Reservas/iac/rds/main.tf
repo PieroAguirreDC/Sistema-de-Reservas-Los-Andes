@@ -88,7 +88,7 @@ resource "aws_db_instance" "main" {
   enabled_cloudwatch_logs_exports = ["postgresql"]
 
   # Backup
-  backup_retention_period = 1
+  backup_retention_period = 7
   backup_window           = var.backup_window
   maintenance_window      = var.maintenance_window
   copy_tags_to_snapshot   = true

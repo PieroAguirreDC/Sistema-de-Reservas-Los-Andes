@@ -53,15 +53,19 @@ variable "secret_rds_arn" {
   type        = string
 }
 
-# ─── AURORA ───────────────────────────────────────────────────────────────────
+# ─── RDS POSTGRESQL ──────────────────────────────────────────────────────────
+# Nota: los nombres de variables mantienen el prefijo "aurora_" por
+# compatibilidad con los módulos que las consumen. La instancia real
+# es RDS PostgreSQL estándar (Free Tier), no Aurora.
+# ─────────────────────────────────────────────────────────────────────────────
 variable "aurora_instance_class" {
-  description = "Tipo de instancia Aurora (dev: db.t3.medium | prod: db.r6g.large)"
+  description = "Tipo de instancia RDS PostgreSQL (dev: db.t3.micro Free Tier | prod: db.r6g.large)"
   type        = string
   default     = "db.t3.medium"
 }
 
 variable "aurora_engine_version" {
-  description = "Versión del motor Aurora PostgreSQL"
+  description = "Versión del motor RDS PostgreSQL (no Aurora)"
   type        = string
   default     = "15.13"
 }
@@ -80,7 +84,7 @@ variable "aurora_port" {
 
 # ─── BACKUP ───────────────────────────────────────────────────────────────────
 variable "backup_retention_days" {
-  description = "Días de retención del backup automático de Aurora (1-35)"
+  description = "Días de retención del backup automático de RDS (1-35). RNF 4 exige mínimo 7."
   type        = number
   default     = 7
 
@@ -103,7 +107,7 @@ variable "maintenance_window" {
 }
 
 variable "aws_backup_retention_days" {
-  description = "Días de retención en AWS Backup (mayor que el backup nativo de Aurora)"
+  description = "Días de retención en AWS Backup (complementa el backup nativo de RDS)"
   type        = number
   default     = 30
 }

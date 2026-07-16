@@ -19,12 +19,15 @@ locals {
   }, var.tags)
 }
 
+data "aws_caller_identity" "current" {}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # APPLICATION LOAD BALANCER
 # ─────────────────────────────────────────────────────────────────────────────
 resource "aws_s3_bucket" "access_logs" {
-  bucket = "${local.name_prefix}-alb-logs-dev"
-  tags   = local.base_tags
+  bucket        = "${local.name_prefix}-alb-logs-${data.aws_caller_identity.current.account_id}"
+  force_destroy = true
+  tags          = local.base_tags
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
@@ -68,6 +71,8 @@ resource "aws_s3_bucket_public_access_block" "access_logs" {
   restrict_public_buckets = true
 }
 
+data "aws_elb_service_account" "main" {}
+
 resource "aws_s3_bucket_policy" "access_logs" {
   bucket = aws_s3_bucket.access_logs.id
 
@@ -77,7 +82,7 @@ resource "aws_s3_bucket_policy" "access_logs" {
       Sid    = "AllowELBLogs"
       Effect = "Allow"
       Principal = {
-        AWS = "arn:aws:iam::127311923021:root"
+        AWS = data.aws_elb_service_account.main.arn
       }
       Action   = "s3:PutObject"
       Resource = "${aws_s3_bucket.access_logs.arn}/*"
@@ -92,7 +97,7 @@ resource "aws_lb" "main" {
   security_groups    = [var.sg_alb_id]
   subnets            = var.public_subnet_ids
 
-  enable_deletion_protection = true
+  enable_deletion_protection = false
   drop_invalid_header_fields = true
 
   access_logs {
@@ -350,8 +355,9 @@ resource "aws_lb_listener_rule" "api_fallback" {
 }
 
 resource "aws_s3_bucket" "waf_logs" {
-  bucket = "${local.name_prefix}-waf-logs-dev"
-  tags   = local.base_tags
+  bucket        = "${local.name_prefix}-waf-logs-${data.aws_caller_identity.current.account_id}"
+  force_destroy = true
+  tags          = local.base_tags
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "waf_logs" {

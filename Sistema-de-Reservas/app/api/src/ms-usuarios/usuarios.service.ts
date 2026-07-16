@@ -6,13 +6,15 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { createHash } from 'crypto';
+import * as bcrypt from 'bcrypt';
 import { Usuario } from './entities/usuario.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { LoginDto } from './dto/login.dto';
 
-function hashPassword(plain: string): string {
-  return createHash('sha256').update(plain).digest('hex');
+const SALT_ROUNDS = 10;
+
+async function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, SALT_ROUNDS);
 }
 
 @Injectable()
@@ -55,7 +57,7 @@ export class UsuariosService {
     const usuario = this.repo.create({
       ...dto,
       rol: dto.rol || 'cliente',
-      password: hashPassword(dto.password),
+      password: await hashPassword(dto.password),
     });
     const saved = await this.repo.save(usuario);
     const { password: _pw, ...rest } = saved;
@@ -64,7 +66,7 @@ export class UsuariosService {
 
   async login(dto: LoginDto): Promise<Omit<Usuario, 'password'>> {
     const usuario = await this.repo.findOne({ where: { email: dto.email } });
-    if (!usuario || usuario.password !== hashPassword(dto.password)) {
+    if (!usuario || !(await bcrypt.compare(dto.password, usuario.password))) {
       throw new UnauthorizedException('Credenciales incorrectas');
     }
     const { password: _pw, ...rest } = usuario;
@@ -74,7 +76,7 @@ export class UsuariosService {
   async update(id: string, data: Partial<CreateUsuarioDto>): Promise<Omit<Usuario, 'password'>> {
     const usuario = await this.repo.findOne({ where: { id } });
     if (!usuario) throw new NotFoundException(`Usuario ${id} no encontrado`);
-    if (data.password) data.password = hashPassword(data.password);
+    if (data.password) data.password = await hashPassword(data.password);
     Object.assign(usuario, data);
     const saved = await this.repo.save(usuario);
     const { password: _pw, ...rest } = saved;

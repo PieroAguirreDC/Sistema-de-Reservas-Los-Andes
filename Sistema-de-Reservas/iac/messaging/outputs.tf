@@ -75,3 +75,13 @@ output "dlq_auditoria_arn" {
   description = "ARN de la DLQ auditoría"
   value       = aws_sqs_queue.auditoria_dlq.arn
 }
+
+output "sqs_reservas_habitaciones_url" {
+  description = "URL de la cola reservas→habitaciones"
+  value       = aws_sqs_queue.reservas_habitaciones.id
+}
+
+output "sqs_reservas_habitaciones_arn" {
+  description = "ARN de la cola reservas→habitaciones"
+  value       = aws_sqs_queue.reservas_habitaciones.arn
+}

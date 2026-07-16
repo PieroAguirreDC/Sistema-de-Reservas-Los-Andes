@@ -178,7 +178,11 @@ locals {
     { name = "SNS_TOPIC_PAGOS_ARN", value = var.sns_topic_pagos_arn },
     { name = "SQS_RESERVAS_NOTIFICACIONES_URL", value = var.sqs_reservas_notificaciones_url },
     { name = "SQS_PAGOS_NOTIFICACIONES_URL", value = var.sqs_pagos_notificaciones_url },
-    { name = "SQS_RESERVAS_PAGOS_URL", value = var.sqs_reservas_pagos_url }
+    { name = "SQS_RESERVAS_PAGOS_URL", value = var.sqs_reservas_pagos_url },
+    { name = "SQS_RESERVAS_HABITACIONES_URL", value = var.sqs_reservas_habitaciones_url },
+    { name = "COGNITO_USER_POOL_ID", value = var.cognito_user_pool_id },
+    { name = "COGNITO_CLIENT_ID", value = var.cognito_client_id },
+    { name = "COGNITO_REGION", value = var.aws_region }
   ]
 
   common_secrets = [

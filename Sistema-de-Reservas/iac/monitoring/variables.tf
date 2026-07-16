@@ -73,3 +73,8 @@ variable "kms_key_arn" {
   type        = string
   default     = ""
 }
+
+variable "ecs_cluster_prefix" {
+  description = "Prefijo del cluster ECS para construir los nombres de log groups (ej. reservas-dev)"
+  type        = string
+}

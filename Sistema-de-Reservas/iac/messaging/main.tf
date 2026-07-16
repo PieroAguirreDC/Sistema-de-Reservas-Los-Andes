@@ -306,3 +306,35 @@ resource "aws_sqs_queue_policy" "auditoria" {
     }]
   })
 }
+
+resource "aws_sqs_queue" "reservas_habitaciones" {
+  name                       = "${local.name_prefix}-reservas-habitaciones"
+  kms_master_key_id          = var.kms_key_arn
+  visibility_timeout_seconds = 30
+  message_retention_seconds  = 86400
+  receive_wait_time_seconds  = 20
+}
+
+resource "aws_sns_topic_subscription" "reservas_to_habitaciones" {
+  topic_arn            = aws_sns_topic.reservas.arn
+  protocol             = "sqs"
+  endpoint             = aws_sqs_queue.reservas_habitaciones.arn
+  raw_message_delivery = true
+}
+
+resource "aws_sqs_queue_policy" "reservas_habitaciones" {
+  queue_url = aws_sqs_queue.reservas_habitaciones.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "AllowSNSReservas"
+      Effect    = "Allow"
+      Principal = { Service = "sns.amazonaws.com" }
+      Action    = "sqs:SendMessage"
+      Resource  = aws_sqs_queue.reservas_habitaciones.arn
+      Condition = {
+        ArnEquals = { "aws:SourceArn" = aws_sns_topic.reservas.arn }
+      }
+    }]
+  })
+}
