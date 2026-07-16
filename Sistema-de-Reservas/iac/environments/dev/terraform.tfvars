@@ -20,7 +20,7 @@ certificate_arn = ""
 
 # ─── Monitoreo ────────────────────────────────────────────────────────────────
 # Email para alarmas de CloudWatch (opcional en dev)
-alarm_email = ""
+alarm_email = "rodrigo.baldeonj@gmail.com"
 
 # ─── Tags adicionales ─────────────────────────────────────────────────────────
 tags = {
