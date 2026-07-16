@@ -1,0 +1,39 @@
+name: Checkov IaC Security Scan
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - "Sistema-de-Reservas/iac/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+jobs:
+  checkov:
+    name: Escaneo de seguridad IaC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Ejecutar Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: Sistema-de-Reservas/iac
+          framework: terraform
+          soft_fail: true
+          output_format: cli,sarif
+          output_file_path: console,checkov-results.sarif
+
+      - name: Subir resultados SARIF a GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: checkov-results.sarif

@@ -20,7 +20,7 @@ terraform {
 
   # backend "s3" {
   #   bucket         = "reservas-terraform-state"
-  #   key            = "dev/terraform.tfstate"
+  #   key            = "prod/terraform.tfstate"
   #   region         = "us-east-2"
   #   dynamodb_table = "reservas-terraform-locks"
   #   encrypt        = true
@@ -100,7 +100,7 @@ module "rds" {
   secret_rds_arn        = module.security.secret_rds_arn
   db_master_password    = random_password.db_master_password.result
 
-  aurora_instance_class     = "db.t3.medium" # dev: barato. prod usará db.r6g.large
+  aurora_instance_class     = "db.r6g.large"
   aurora_engine_version     = "15.8"
   aurora_database_name      = "reservas_db"
   backup_retention_days     = 7
@@ -121,7 +121,7 @@ module "elasticache" {
   availability_zones    = module.vpc.availability_zones
   sg_elasticache_id     = module.security.sg_elasticache_id
   kms_key_arn           = module.security.kms_key_arn
-  node_type             = "cache.t3.micro" # dev: barato. prod usará cache.r6g.large
+  node_type             = "cache.r6g.large"
   redis_engine_version  = "7.0"
   redis_auth_token      = random_password.redis_auth_token.result
 
@@ -209,11 +209,11 @@ module "ecs_fargate" {
   notificaciones_image_uri = "${module.ecr.notificaciones_repository_url}:latest"
   web_image_uri            = "${module.ecr.web_repository_url}:latest"
 
-  api_cpu       = 256
-  api_memory    = 512
-  web_cpu       = 256
-  web_memory    = 512
-  desired_count = 1
+  api_cpu       = 512
+  api_memory    = 1024
+  web_cpu       = 512
+  web_memory    = 1024
+  desired_count = 2
 
   # Base de datos
   rds_proxy_endpoint   = module.rds.rds_proxy_endpoint

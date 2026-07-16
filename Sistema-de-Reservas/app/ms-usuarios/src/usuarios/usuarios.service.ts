@@ -104,9 +104,12 @@ export class UsuariosService {
   }
 
   async login(dto: LoginDto) {
+    this.logger.log(`Intento de login: ${dto.email}`);
+
     // Verificar contra BD local
     const usuario = await this.repo.findOne({ where: { email: dto.email } });
     if (!usuario || !(await bcrypt.compare(dto.password, usuario.password))) {
+      this.logger.warn(`Login fallido: email=${dto.email} motivo=credenciales_invalidas`);
       throw new UnauthorizedException('Credenciales incorrectas');
     }
 
@@ -134,6 +137,7 @@ export class UsuariosService {
       }
     }
 
+    this.logger.log(`Login exitoso: usuario_id=${usuario.id} email=${dto.email}`);
     const { password: _pw, ...userWithoutPw } = usuario;
     return { ...tokens, usuario: userWithoutPw };
   }

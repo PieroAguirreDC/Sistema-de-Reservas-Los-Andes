@@ -31,18 +31,23 @@ jobs:
           - service: usuarios
             ecr_repo: api-usuarios
             container_name: usuarios
+            path: app/ms-usuarios
           - service: habitaciones
             ecr_repo: api-habitaciones
             container_name: habitaciones
+            path: app/ms-habitaciones
           - service: reservas
             ecr_repo: api-reservas
             container_name: reservas
+            path: app/ms-reservas
           - service: pagos
             ecr_repo: api-pagos
             container_name: pagos
+            path: app/ms-pagos
           - service: notificaciones
             ecr_repo: api-notificaciones
             container_name: notificaciones
+            path: app/ms-notificaciones
 
     steps:
       - name: checkout del código
@@ -55,14 +60,14 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: Sistema-de-Reservas/app/api/package-lock.json
+          cache-dependency-path: Sistema-de-Reservas/${{ matrix.path }}/package-lock.json
 
       - name: instalar dependencias de la api
-        working-directory: Sistema-de-Reservas/app/api
+        working-directory: Sistema-de-Reservas/${{ matrix.path }}
         run: npm ci
 
       - name: ejecutar pruebas unitarias
-        working-directory: Sistema-de-Reservas/app/api
+        working-directory: Sistema-de-Reservas/${{ matrix.path }}
         run: npm run test -- --passWithNoTests
 
       - name: autenticacion oidc con aws
@@ -92,8 +97,8 @@ jobs:
         run: |
           docker build \
             -t $ECR_REGISTRY/${{ matrix.ecr_repo }}:$IMAGE_TAG \
-            -f Sistema-de-Reservas/app/api/Dockerfile \
-            Sistema-de-Reservas/app/api/
+            -f Sistema-de-Reservas/${{ matrix.path }}/Dockerfile \
+            Sistema-de-Reservas/
           docker push $ECR_REGISTRY/${{ matrix.ecr_repo }}:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/${{ matrix.ecr_repo }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
 

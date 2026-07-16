@@ -133,6 +133,25 @@ resource "aws_iam_role_policy" "ecs_task_messaging" {
   policy = data.aws_iam_policy_document.ecs_task_messaging.json
 }
 
+resource "aws_iam_role_policy" "ecs_exec" {
+  name = "${local.name_prefix}-ecs-exec"
+  role = aws_iam_role.ecs_task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel"
+      ]
+      Resource = "*"
+    }]
+  })
+}
+
 # Permiso para que el EXECUTION role pueda leer el secret de RDS al arrancar
 # el contenedor (inyección vía "secrets" en el container_definitions)
 data "aws_iam_policy_document" "ecs_execution_secrets" {
@@ -146,8 +165,8 @@ data "aws_iam_policy_document" "ecs_execution_secrets" {
   # 1) Descifrar el secret de Secrets Manager (cifrado con KMS)
   # 2) Escribir en el CloudWatch log group cifrado con KMS
   statement {
-    effect  = "Allow"
-    actions = ["kms:Decrypt", "kms:GenerateDataKey"]
+    effect    = "Allow"
+    actions   = ["kms:Decrypt", "kms:GenerateDataKey"]
     resources = [var.kms_key_arn]
   }
 }
@@ -397,11 +416,12 @@ resource "aws_ecs_task_definition" "web" {
 # ─────────────────────────────────────────────────────────────────────────────
 
 resource "aws_ecs_service" "usuarios" {
-  name            = "${local.name_prefix}-usuarios-svc"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.usuarios.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                   = "${local.name_prefix}-usuarios-svc"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.usuarios.arn
+  desired_count          = var.desired_count
+  launch_type            = "FARGATE"
+  enable_execute_command = true
 
   network_configuration {
     subnets          = var.private_subnet_ids
@@ -426,11 +446,12 @@ resource "aws_ecs_service" "usuarios" {
 }
 
 resource "aws_ecs_service" "habitaciones" {
-  name            = "${local.name_prefix}-habitaciones-svc"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.habitaciones.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                   = "${local.name_prefix}-habitaciones-svc"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.habitaciones.arn
+  desired_count          = var.desired_count
+  launch_type            = "FARGATE"
+  enable_execute_command = true
 
   network_configuration {
     subnets          = var.private_subnet_ids
@@ -455,11 +476,12 @@ resource "aws_ecs_service" "habitaciones" {
 }
 
 resource "aws_ecs_service" "reservas" {
-  name            = "${local.name_prefix}-reservas-svc"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.reservas.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                   = "${local.name_prefix}-reservas-svc"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.reservas.arn
+  desired_count          = var.desired_count
+  launch_type            = "FARGATE"
+  enable_execute_command = true
 
   network_configuration {
     subnets          = var.private_subnet_ids
@@ -484,11 +506,12 @@ resource "aws_ecs_service" "reservas" {
 }
 
 resource "aws_ecs_service" "pagos" {
-  name            = "${local.name_prefix}-pagos-svc"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.pagos.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                   = "${local.name_prefix}-pagos-svc"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.pagos.arn
+  desired_count          = var.desired_count
+  launch_type            = "FARGATE"
+  enable_execute_command = true
 
   network_configuration {
     subnets          = var.private_subnet_ids
@@ -513,11 +536,12 @@ resource "aws_ecs_service" "pagos" {
 }
 
 resource "aws_ecs_service" "notificaciones" {
-  name            = "${local.name_prefix}-notificaciones-svc"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.notificaciones.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                   = "${local.name_prefix}-notificaciones-svc"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.notificaciones.arn
+  desired_count          = var.desired_count
+  launch_type            = "FARGATE"
+  enable_execute_command = true
 
   network_configuration {
     subnets          = var.private_subnet_ids
@@ -542,11 +566,12 @@ resource "aws_ecs_service" "notificaciones" {
 }
 
 resource "aws_ecs_service" "web" {
-  name            = "${local.name_prefix}-web-svc"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.web.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                   = "${local.name_prefix}-web-svc"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.web.arn
+  desired_count          = var.desired_count
+  launch_type            = "FARGATE"
+  enable_execute_command = true
 
   network_configuration {
     subnets          = var.private_subnet_ids

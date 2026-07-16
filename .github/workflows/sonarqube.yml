@@ -30,14 +30,18 @@ jobs:
           cache: "npm"
           cache-dependency-path: Sistema-de-Reservas/app/api/package-lock.json
 
-      - name: Instalar dependencias de la API
-        working-directory: Sistema-de-Reservas/app/api
-        run: npm ci
-
-      - name: Ejecutar pruebas unitarias con cobertura
-        working-directory: Sistema-de-Reservas/app/api
-        run: npm run test:cov -- --passWithNoTests
-        continue-on-error: true
+      - name: Instalar dependencias y ejecutar pruebas
+        working-directory: Sistema-de-Reservas/app
+        run: |
+          for dir in ms-usuarios ms-habitaciones ms-reservas ms-pagos ms-notificaciones libs/common; do
+            echo "Procesando $dir..."
+            cd $dir
+            npm ci
+            if [ -f "package.json" ] && grep -q '"test:cov"' "package.json"; then
+              npm run test:cov -- --passWithNoTests || true
+            fi
+            cd - > /dev/null
+          done
 
       - name: Ejecutar analisis de SonarQube
         uses: SonarSource/sonarqube-scan-action@v6
@@ -49,9 +53,9 @@ jobs:
             -Dsonar.organization=SDRDHS
             -Dsonar.projectKey=hotel-losandes
             -Dsonar.projectName="Sistema de Reservas Hotel Los Andes"
-            -Dsonar.sources=Sistema-de-Reservas/app/api/src,Sistema-de-Reservas/app/web/src
+            -Dsonar.sources=Sistema-de-Reservas/app/ms-usuarios/src,Sistema-de-Reservas/app/ms-habitaciones/src,Sistema-de-Reservas/app/ms-reservas/src,Sistema-de-Reservas/app/ms-pagos/src,Sistema-de-Reservas/app/ms-notificaciones/src,Sistema-de-Reservas/app/libs/common/src,Sistema-de-Reservas/app/web/src
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/*.spec.ts,**/coverage/**
-            -Dsonar.typescript.tsconfigPath=Sistema-de-Reservas/app/api/tsconfig.json
+            -Dsonar.typescript.tsconfigPaths=Sistema-de-Reservas/app/ms-usuarios/tsconfig.json,Sistema-de-Reservas/app/ms-habitaciones/tsconfig.json,Sistema-de-Reservas/app/ms-reservas/tsconfig.json,Sistema-de-Reservas/app/ms-pagos/tsconfig.json,Sistema-de-Reservas/app/ms-notificaciones/tsconfig.json,Sistema-de-Reservas/app/libs/common/tsconfig.json
 
       - name: Verificar Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@v1
